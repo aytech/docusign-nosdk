@@ -11,6 +11,7 @@ import com.docusign.esign.client.ApiException;
 import com.docusign.esign.client.Configuration;
 import com.docusign.esign.client.auth.OAuth;
 import com.docusign.esign.model.*;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,7 +46,6 @@ public class DocuSignController {
 
         UserResponse response = new UserResponse();
         String integratorKey = "e1127ed3-f1b5-40e4-b431-06c19f3983bd";
-        String privateKey = new ClassPathResource("jwt/id_rsa_docusign_user_ddabf716.pem").getFile().toString();
 
         /////////////////////////////////////////////////////////////////////////////
         // STEP 1: AUTHENTICATE TO RETRIEVE ACCOUNTID & BASEURL
@@ -58,7 +59,8 @@ public class DocuSignController {
         List<String> scopes = new ArrayList<>();
         scopes.add(OAuth.Scope_SIGNATURE);
         scopes.add(OAuth.Scope_IMPERSONATION);
-        byte[] privateKeyFile = Files.readAllBytes(Paths.get(privateKey));
+        InputStream keyStream = new ClassPathResource("jwt/id_rsa_docusign_user_ddabf716.pem").getInputStream();
+        byte[] privateKeyFile = IOUtils.toByteArray(keyStream);
 
         try {
             OAuth.OAuthToken token = apiClient.requestJWTUserToken(

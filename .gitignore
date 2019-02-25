@@ -7,4 +7,5 @@ server/out/
 
 ### React App ###
 client/.idea/
+client/build
 client/node_modules/

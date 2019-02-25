@@ -1,7 +1,10 @@
 ### Spring Boot ###
-server/.gradle
+server/.gradle/
+server/.idea/
 server/build/
 server/out/
 
-### IntelliJ IDEA ###
-.idea
+
+### React App ###
+client/.idea/
+client/node_modules/

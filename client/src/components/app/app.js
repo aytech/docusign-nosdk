@@ -1,0 +1,78 @@
+import React, { Component } from 'react';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import './app.css';
+import SubmitForm from "../submit-form/submit-form";
+import Footer from "../footer/footer";
+import Modal from "../modal/modal";
+import PageHeader from "../page-header/page-header";
+import PageBody from "../page-body/page-body";
+
+class App extends Component {
+
+  state = {
+    signModalOpen: false,
+    user: null,
+    users: null
+  };
+
+  openSignDocumentModal = () => {
+    this.setState({
+      signModalOpen: true
+    });
+  };
+
+  closeSignDocumentModal = () => {
+    this.setState({
+      signModalOpen: false
+    });
+  };
+
+  onDocumentSubmit = () => {
+    this.setState({
+      signModalOpen: false,
+    });
+  };
+
+  onUserLoad = (user, users) => {
+    this.setState({
+      user, users
+    });
+  };
+
+  render() {
+    return (
+      <BrowserRouter>
+        <Switch>
+          <Route path='/' render={ () => {
+            return (
+              <div className='container main'>
+                <PageHeader
+                  onSignDocument={ this.openSignDocumentModal }
+                  onUserLoad={ this.onUserLoad }/>
+                <PageBody user={ this.state.user }/>
+                <Modal
+                  header="Sign document"
+                  show={ this.state.signModalOpen === true }
+                  onClose={ this.closeSignDocumentModal }>
+                  <SubmitForm
+                    users={ this.state.users }
+                    onDocumentSubmit={ this.onDocumentSubmit }/>
+                </Modal>
+                <Footer/>
+              </div>
+            )
+          } } exact={ true }/>
+          <Route path='/iframe' render={ () => {
+            window.close();
+            return (
+              <h1>Closing</h1>
+            )
+          } }/>
+          <Route render={ () => <h2>Page not found!</h2> }/>
+        </Switch>
+      </BrowserRouter>
+    );
+  }
+}
+
+export default App;

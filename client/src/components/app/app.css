@@ -1,0 +1,22 @@
+body {
+  display: flex;
+  flex-direction: column;
+  padding-top: 70px;
+  padding-bottom: 60px;
+}
+
+p {
+  margin: 0;
+}
+
+.btn {
+  margin-right: 10px;
+}
+
+.container {
+  flex: 1 0 auto;
+}
+
+.main {
+  margin-bottom: 50px;
+}

@@ -1,0 +1,13 @@
+
+.fa {
+  color: #007bff;
+}
+
+.fa.inline {
+  display: inline-block;
+}
+
+.file-name {
+  font-size: 26px;
+  margin-right: 40px;
+}

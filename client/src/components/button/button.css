@@ -1,0 +1,7 @@
+.fa-sm {
+  font-size: 1em;
+}
+
+.fa-sm > i {
+  margin-right: 5px;
+}

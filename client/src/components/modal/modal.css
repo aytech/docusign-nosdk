@@ -1,0 +1,52 @@
+.backdrop {
+  background-color: rgba(0, 0, 0, 0.3);
+  bottom: 0;
+  left: 0;
+  padding: 50px;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+
+.modal-header {
+  vertical-align: middle;
+}
+
+.modal-header h2 {
+  display: inline-block;
+  margin: 0;
+}
+
+.modal-container {
+  background-color: #ffffff;
+  border-radius: 5px;
+  margin: 0 auto;
+  padding: 3rem;
+  position: relative;
+  transform: none;
+  transition: transform .3s ease-out, -webkit-transform .3s ease-out;
+}
+
+.modal-button {
+  background-color: #007bff;
+  border: 1px solid #007bff;
+  border-radius: .3rem;
+  color: #ffffff;
+  cursor: pointer;
+  width: 80%;
+  padding: 2rem;
+  font-size: 2rem;
+  line-height: 2px;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.modal-body.iframe {
+  height: 720px;
+}
+
+@media (min-width: 576px) {
+  .modal-container {
+    max-width: 900px;
+    margin: 1.75rem auto;
+  }
+}

@@ -1,0 +1,7 @@
+### Spring Boot ###
+server/.gradle
+server/build/
+server/out/
+
+### IntelliJ IDEA ###
+.idea

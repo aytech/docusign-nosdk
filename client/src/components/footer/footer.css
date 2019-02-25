@@ -1,0 +1,10 @@
+footer {
+  flex-shrink: 0;
+  height: 50px;
+}
+
+.flex-centered {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}

@@ -1,0 +1,31 @@
+body {
+  padding-top: 70px;
+  padding-bottom: 60px;
+}
+
+footer {
+  height: 50px;
+}
+
+p {
+  margin: 0;
+}
+
+.btn {
+  margin-right: 10px;
+}
+
+.file-name {
+  font-size: 26px;
+  margin-right: 15px;
+}
+
+.main {
+  margin-bottom: 50px;
+}
+
+.flex-centered {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}

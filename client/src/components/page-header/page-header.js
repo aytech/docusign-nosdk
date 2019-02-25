@@ -91,14 +91,14 @@ export default class PageHeader extends Component {
     if (this.state.loading !== true && !this.state.authenticated) {
       markup = (
         <React.Fragment>
-          <button type='button' className='btn btn-primary btn-xs' onClick={ this.authenticateAdmin }>
-            Sign as Oleg (Infor - admin)
+          <button type='button' className='btn btn-primary btn-sm' onClick={ this.authenticateAdmin }>
+            Sign as Oleg Infor
           </button>
-          <button type='button' className='btn btn-primary btn-xs' onClick={ this.authenticateGmail }>
-            Sign as Oleg (Gmail - IDM)
+          <button type='button' className='btn btn-primary btn-sm' onClick={ this.authenticateGmail }>
+            Sign as Oleg Gmail
           </button>
-          <button type='button' className='btn btn-primary btn-xs' onClick={ this.authenticateSeznam }>
-            Sign as Oleg (Seznam - IDM)
+          <button type='button' className='btn btn-primary btn-sm' onClick={ this.authenticateSeznam }>
+            Sign as Oleg Seznam
           </button>
         </React.Fragment>
       );
@@ -113,9 +113,13 @@ export default class PageHeader extends Component {
     }
 
     return (
-      <div className='page-header'>
-        <span className='file-name'>Resource file - <strong>demo_document.pdf</strong></span>
-        { markup }
+      <div className='page-header row'>
+        <div className="col-xs-12 col-lg-7">
+          <span className='file-name'>Resource file - <strong>demo_document.pdf</strong></span>
+        </div>
+        <div className="col-xs-12 col-lg-5">
+          { markup }
+        </div>
       </div>
     );
   }

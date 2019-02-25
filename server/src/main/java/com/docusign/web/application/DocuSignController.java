@@ -67,7 +67,6 @@ public class DocuSignController {
                     integratorKey, userId, scopes, privateKeyFile, 3600); // request for a fresh JWT token valid for 1 hour
             apiClient.setAccessToken(token.getAccessToken(), token.getExpiresIn());
             OAuth.UserInfo userInfo = apiClient.getUserInfo(apiClient.getAccessToken());
-            System.out.println("User info: " + userInfo);
             BaseUrl = userInfo.getAccounts().get(0).getBaseUri();
             apiClient.setBasePath(BaseUrl + "/restapi");
             accountID = userInfo.getAccounts().get(0).getAccountId();
@@ -114,9 +113,8 @@ public class DocuSignController {
         String brandId = "4c7bbcc1-65ad-4326-bf51-34595a55f7fa";
 
         Document document = new Document();
-        Path pathToDocument =
-                Paths.get(new ClassPathResource("static/demo_document.pdf").getFile().toString());
-        String base64Doc = Base64.getEncoder().encodeToString(Files.readAllBytes(pathToDocument));
+        InputStream documentFile = new ClassPathResource("static/demo_document.pdf").getInputStream();
+        String base64Doc = Base64.getEncoder().encodeToString(IOUtils.toByteArray(documentFile));
         document.setDocumentBase64(base64Doc);
         document.setDocumentId("1");
         document.setName("Test document");

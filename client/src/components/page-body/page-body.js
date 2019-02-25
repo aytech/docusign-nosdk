@@ -18,13 +18,7 @@ export default class PageBody extends Component {
     return (
       <div className="page-body">
         <div className="row">
-          <div className="col-md-9">
-            <embed
-              src={ '/demo_document.pdf' }
-              width='800'
-              height='1100px'/>
-          </div>
-          <div className="col-md-3">
+          <div className="col-md-12 col-lg-3">
             <div className="table-responsive">
               <table className="table">
                 <caption>Authenticated as:</caption>
@@ -47,6 +41,12 @@ export default class PageBody extends Component {
                 </tbody>
               </table>
             </div>
+          </div>
+          <div className="col-md-12 col-lg-9">
+            <embed
+              src={ '/demo_document.pdf' }
+              width='800'
+              height='1100px'/>
           </div>
         </div>
       </div>

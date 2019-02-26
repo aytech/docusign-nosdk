@@ -106,7 +106,7 @@ export default class PageHeader extends Component {
 
     if (this.state.loading !== true && this.state.authenticated) {
       markup = (
-        <button type='button' className='btn btn-primary btn-xs' onClick={ onSignDocument }>
+        <button type='button' className='btn btn-primary btn-sm' onClick={ onSignDocument }>
           Sign document
         </button>
       );

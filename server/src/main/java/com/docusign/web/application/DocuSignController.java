@@ -21,11 +21,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
+
+import static com.docusign.configuration.Configuration.*;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -77,15 +76,7 @@ public class DocuSignController {
         } catch (ApiException e) {
             System.out.println("Error authenticating JWT: " + e.getMessage());
             e.printStackTrace();
-            // configure the authorization flow on the api client
-            // must match a redirect URI (case-sensitive) you configured on the key
-            String redirectUri = "http://localhost:3000";
-            // point to the demo (sandbox) environment. For production requests your account sub-domain
-            // will vary, you should always use the base URI that is returned from authentication to
-            // ensure your integration points to the correct endpoints (in both environments)
-            // use demo authentication server (remove -d for production)
-            String authServerUrl = "https://account-d.docusign.com";
-            response.setJwtUrl(apiClient.getJWTUri(integratorKey, redirectUri, authServerUrl));
+            response.setJwtUrl(apiClient.getJWTUri(integratorKey, REDIRECT_URI, AUTH_SERVER_URI));
             response.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
@@ -110,7 +101,6 @@ public class DocuSignController {
     public HttpEntity<EnvelopeSummary> signDocument(@RequestBody SignRequest request) throws IOException, ApiException {
 
         EnvelopeTemplate envelopeTemplate = new EnvelopeTemplate();
-        String brandId = "4c7bbcc1-65ad-4326-bf51-34595a55f7fa";
 
         Document document = new Document();
         InputStream documentFile = new ClassPathResource("static/demo_document.pdf").getInputStream();
@@ -123,7 +113,7 @@ public class DocuSignController {
         documents.add(document);
 
         envelopeTemplate.setDocuments(documents);
-        envelopeTemplate.setBrandId(brandId);
+        envelopeTemplate.setBrandId(INFOR_BRAND_ID);
         envelopeTemplate.setEmailSubject(request.getSubject());
 
         EnvelopeTemplateDefinition envelopeTemplateDefinition = new EnvelopeTemplateDefinition();

@@ -55,12 +55,14 @@ export default class PageHeader extends Component {
           authenticated: authenticated,
           loading: false
         });
-        if (authenticated) {
-          return response.json();
-        }
+        return response.json();
       })
       .then(data => {
-        if (data !== undefined) {
+        // noinspection JSUnresolvedVariable
+        if (data.userInfo === null && data.users === null) {
+          // noinspection JSUnresolvedVariable
+          window.location.href = data.jwtUrl;
+        } else {
           // noinspection JSUnresolvedVariable
           this.props.onUserLoad(data.userInfo, data.users);
         }

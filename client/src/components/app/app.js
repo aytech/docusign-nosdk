@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import './app.css';
 import SubmitForm from "../submit-form/submit-form";
 import Footer from "../footer/footer";
 import Modal from "../modal/modal";
 import PageHeader from "../page-header/page-header";
 import PageBody from "../page-body/page-body";
+
+import './app.css';
 
 class App extends Component {
 
@@ -62,12 +63,6 @@ class App extends Component {
               </div>
             )
           } } exact={ true }/>
-          <Route path='/iframe' render={ () => {
-            window.close();
-            return (
-              <h1>Closing</h1>
-            )
-          } }/>
           <Route render={ () => <h2>Page not found!</h2> }/>
         </Switch>
       </BrowserRouter>

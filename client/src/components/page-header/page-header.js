@@ -61,7 +61,7 @@ export default class PageHeader extends Component {
         // noinspection JSUnresolvedVariable
         if (data.userInfo === null && data.users === null) {
           // noinspection JSUnresolvedVariable
-          window.location.href = data.jwtUrl;
+          window.open(data.jwtUrl, '_blank');
         } else {
           // noinspection JSUnresolvedVariable
           this.props.onUserLoad(data.userInfo, data.users);

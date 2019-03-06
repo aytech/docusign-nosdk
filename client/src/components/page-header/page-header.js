@@ -69,6 +69,22 @@ export default class PageHeader extends Component {
       });
   }
 
+  fetchStatus = () => {
+    this.setState({ loading: true });
+    const { onDocumentStatusLoaded } = this.props;
+    fetch('/api/document/status')
+      .then((response) => {
+        this.setState({ loading: false });
+        return response.json();
+      })
+      .then(data => {
+        onDocumentStatusLoaded(data);
+      })
+      .catch(() => {
+        console.log('Could not get status');
+      });
+  };
+
   authenticateAdmin = () => {
     return this.authenticate(this.users.admin)
   };
@@ -108,9 +124,14 @@ export default class PageHeader extends Component {
 
     if (this.state.loading !== true && this.state.authenticated) {
       markup = (
-        <button type='button' className='btn btn-primary btn-sm' onClick={ onSignDocument }>
-          Sign document
-        </button>
+        <React.Fragment>
+          <button type='button' className='btn btn-primary btn-sm' onClick={ onSignDocument }>
+            Sign document
+          </button>
+          <button type="button" className="btn btn-primary btn-sm" onClick={ this.fetchStatus }>
+            Get status
+          </button>
+        </React.Fragment>
       );
     }
 

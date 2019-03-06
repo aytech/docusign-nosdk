@@ -33,6 +33,7 @@ public class DocuSignController {
     private ApiClient apiClient;
     private String BaseUrl = "https://demo.docusign.net";
     private String accountID;
+    private String envelopeID;
 
     @Autowired
     public DocuSignController() {
@@ -143,11 +144,24 @@ public class DocuSignController {
         try {
             EnvelopesApi envelopesApi = new EnvelopesApi();
             EnvelopeSummary envelopeSummary = envelopesApi.createEnvelope(accountID, envelopeDefinition);
+            envelopeID = envelopeSummary.getEnvelopeId();
             return new ResponseEntity<>(envelopeSummary, HttpStatus.OK);
         } catch (ApiException ex) {
             ex.printStackTrace();
             System.out.println("Error creating envelope: " + ex.getMessage());
             return new ResponseEntity<>(null, HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "document/status")
+    public HttpEntity<Envelope> getDocumentStatus() {
+        EnvelopesApi envelopesApi = new EnvelopesApi();
+        try {
+            Envelope summary = envelopesApi.getEnvelope(accountID, envelopeID);
+            return new ResponseEntity<>(summary, HttpStatus.OK);
+        } catch (ApiException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 

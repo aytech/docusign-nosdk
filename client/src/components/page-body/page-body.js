@@ -9,16 +9,24 @@ export default class PageBody extends Component {
       lastName: '',
       email: ''
     };
-    let { user } = this.props;
+    const defaultDocumentStatus = {
+      envelopeId: '',
+      createdDateTime: '',
+      status: ''
+    };
+    let { user, documentStatus } = this.props;
 
     if (user === undefined || user === null) {
       user = defaultUser;
+    }
+    if (documentStatus === undefined || documentStatus === null) {
+      documentStatus = defaultDocumentStatus;
     }
 
     return (
       <div className="page-body">
         <div className="row">
-          <div className="col-md-12 col-lg-3">
+          <div className="col-md-12 col-lg-4">
             <div className="table-responsive">
               <table className="table">
                 <caption>Authenticated as:</caption>
@@ -37,6 +45,27 @@ export default class PageBody extends Component {
                 <tr>
                   <th scope="row">ID:</th>
                   <td>{ user.id }</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="col-md-12 col-lg-4">
+            <div className="table-responsive">
+              <table className="table">
+                <caption>Document status:</caption>
+                <tbody>
+                <tr>
+                  <th scope="row">ID:</th>
+                  <td>{ documentStatus.envelopeId }</td>
+                </tr>
+                <tr>
+                  <th scope="row">Created:</th>
+                  <td>{ documentStatus.createdDateTime }</td>
+                </tr>
+                <tr>
+                  <th scope="row">Status:</th>
+                  <td>{ documentStatus.status }</td>
                 </tr>
                 </tbody>
               </table>

@@ -11,6 +11,7 @@ import './app.css';
 class App extends Component {
 
   state = {
+    documentStatus: null,
     signModalOpen: false,
     user: null,
     users: null
@@ -40,6 +41,10 @@ class App extends Component {
     });
   };
 
+  onDocumentStatusLoaded = (documentStatus) => {
+    this.setState({ documentStatus });
+  };
+
   render() {
     return (
       <BrowserRouter>
@@ -48,9 +53,12 @@ class App extends Component {
             return (
               <div className='container main'>
                 <PageHeader
+                  onDocumentStatusLoaded={ this.onDocumentStatusLoaded }
                   onSignDocument={ this.openSignDocumentModal }
                   onUserLoad={ this.onUserLoad }/>
-                <PageBody user={ this.state.user }/>
+                <PageBody
+                  documentStatus={ this.state.documentStatus }
+                  user={ this.state.user }/>
                 <Modal
                   header="Sign document"
                   show={ this.state.signModalOpen === true }

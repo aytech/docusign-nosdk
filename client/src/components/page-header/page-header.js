@@ -14,6 +14,22 @@ export default class PageHeader extends Component {
     loading: true
   };
 
+  componentWillMount() {
+    const { queryParams: { search } } = this.props;
+
+    if (search.indexOf('code')) {
+      const indexStart = search.indexOf('=') + 1;
+      const indexEnd = search.indexOf('&');
+      const code = search.substring(indexStart, indexEnd);
+      fetch('/api/auth/grant/' + code)
+        .then((response) => {
+          if (response.status === 200) {
+            window.location.href = '/';
+          }
+        });
+    }
+  }
+
   componentDidMount() {
 
     const { onUserLoad } = this.props;
@@ -94,7 +110,19 @@ export default class PageHeader extends Component {
   };
 
   authenticateSeznam = () => {
-    return this.authenticate(this.users.seznam)
+    this.setState({
+      loading: true
+    });
+    const host = window.location.hostname;
+    const port = window.location.port;
+    fetch('/api/auth/code/' + encodeURIComponent(host + ':' + port))
+      .then((response) => {
+        this.setState({ loading: false });
+        return response.json();
+      })
+      .then(data => {
+        window.location.href = decodeURIComponent(data);
+      });
   };
 
   render() {
@@ -116,7 +144,7 @@ export default class PageHeader extends Component {
             Sign as Oleg Gmail
           </button>
           <button type='button' className='btn btn-primary btn-sm' onClick={ this.authenticateSeznam }>
-            Sign as Oleg Seznam
+            Auth Code Grant
           </button>
         </React.Fragment>
       );

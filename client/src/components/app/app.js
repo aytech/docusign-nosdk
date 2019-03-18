@@ -49,13 +49,14 @@ class App extends Component {
     return (
       <BrowserRouter>
         <Switch>
-          <Route path='/' render={ () => {
+          <Route path='/' render={ (props) => {
             return (
               <div className='container main'>
                 <PageHeader
                   onDocumentStatusLoaded={ this.onDocumentStatusLoaded }
                   onSignDocument={ this.openSignDocumentModal }
-                  onUserLoad={ this.onUserLoad }/>
+                  onUserLoad={ this.onUserLoad }
+                  queryParams={ props.location }/>
                 <PageBody
                   documentStatus={ this.state.documentStatus }
                   user={ this.state.user }/>

@@ -21,6 +21,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 
@@ -32,6 +36,7 @@ public class DocuSignController {
 
     private ApiClient apiClient;
     private String BaseUrl = "https://demo.docusign.net";
+    private String integratorKey = "e1127ed3-f1b5-40e4-b431-06c19f3983bd";
     private String accountID;
     private String envelopeID;
 
@@ -41,11 +46,36 @@ public class DocuSignController {
         Configuration.setDefaultApiClient(apiClient);
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "auth/code/{redirectUrl}")
+    public HttpEntity<URI> getCodeGrantAuthURL(@PathVariable("redirectUrl") String redirectUrl) throws UnsupportedEncodingException {
+        String randomState = "state_random_string";
+        String redirect = String.format("http://%s", URLDecoder.decode(redirectUrl, StandardCharsets.UTF_8.name()));
+        List<String> scopes = new ArrayList<>();
+
+        scopes.add(OAuth.Scope_SIGNATURE);
+        URI oauthLoginUrl = apiClient.getAuthorizationUri(integratorKey, scopes, redirect, OAuth.CODE, randomState);
+
+        return new ResponseEntity<>(oauthLoginUrl, HttpStatus.OK);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "auth/grant/{code}")
+    public HttpEntity<Void> authenticateWithCodeGrant(@PathVariable("code") String code) {
+        String clientSecret = "c2c4519e-161f-45ea-b1ae-20f947125e82";
+        try {
+            OAuth.OAuthToken oAuthToken = apiClient.generateAccessToken(integratorKey, clientSecret, code);
+            System.out.println("Oauth Token: " + oAuthToken);
+            apiClient.setAccessToken(oAuthToken.getAccessToken(), oAuthToken.getExpiresIn());
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (ApiException | IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping(method = RequestMethod.GET, value = "auth/jwt/{userId}")
     public HttpEntity<UserResponse> authenticateJWT(@PathVariable("userId") String userId) throws IOException {
 
         UserResponse response = new UserResponse();
-        String integratorKey = "e1127ed3-f1b5-40e4-b431-06c19f3983bd";
 
         /////////////////////////////////////////////////////////////////////////////
         // STEP 1: AUTHENTICATE TO RETRIEVE ACCOUNTID & BASEURL
@@ -87,6 +117,7 @@ public class DocuSignController {
     public HttpEntity<UserResponse> isAuthenticated() {
         try {
             OAuth.UserInfo userInfo = apiClient.getUserInfo(apiClient.getAccessToken());
+            accountID = userInfo.getAccounts().get(0).getAccountId();
             User user = getUserFromUserInfo(userInfo);
             UserResponse response = new UserResponse();
             response.setUserInfo(user);

@@ -1,5 +1,6 @@
 package com.docusign.web.application;
 
+import com.docusign.data.InforEnvelope;
 import com.docusign.data.SignRequest;
 import com.docusign.data.User;
 import com.docusign.data.UserResponse;
@@ -154,10 +155,19 @@ public class DocuSignController {
         TemplatesApi templatesApi = new TemplatesApi();
         TemplateSummary templateSummary = templatesApi.createTemplate(accountID, envelopeTemplate);
 
+        CustomFields customFields = new CustomFields();
+        List<TextCustomField> fields = new ArrayList<>();
+        TextCustomField textCustomField = new TextCustomField();
+        textCustomField.setName("tenant");
+        textCustomField.setValue("infor");
+        fields.add(textCustomField);
+        customFields.setTextCustomFields(fields);
+
         // create a new envelope to manage the signature request
         EnvelopeDefinition envelopeDefinition = new EnvelopeDefinition();
         envelopeDefinition.setEmailSubject(request.getSubject());
         envelopeDefinition.setTemplateId(templateSummary.getTemplateId());
+        envelopeDefinition.setCustomFields(customFields);
 
         TemplateRole templateRole = new TemplateRole();
         templateRole.setRoleName(request.getName());
@@ -185,11 +195,13 @@ public class DocuSignController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "document/status")
-    public HttpEntity<Envelope> getDocumentStatus() {
+    public HttpEntity<InforEnvelope> getDocumentStatus() {
         EnvelopesApi envelopesApi = new EnvelopesApi();
         try {
-            Envelope summary = envelopesApi.getEnvelope(accountID, envelopeID);
-            return new ResponseEntity<>(summary, HttpStatus.OK);
+            Envelope envelope = envelopesApi.getEnvelope(accountID, envelopeID);
+            CustomFieldsEnvelope customFieldsEnvelope = envelopesApi.listCustomFields(accountID, envelopeID);
+            InforEnvelope inforEnvelope = new InforEnvelope(envelope, customFieldsEnvelope);
+            return new ResponseEntity<>(inforEnvelope, HttpStatus.OK);
         } catch (ApiException e) {
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);

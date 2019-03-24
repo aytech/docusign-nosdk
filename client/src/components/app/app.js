@@ -11,7 +11,7 @@ import './app.css';
 class App extends Component {
 
   state = {
-    documentStatus: null,
+    documentEnvelope: {},
     signModalOpen: false,
     user: null,
     users: null
@@ -41,8 +41,8 @@ class App extends Component {
     });
   };
 
-  onDocumentStatusLoaded = (documentStatus) => {
-    this.setState({ documentStatus });
+  onDocumentStatusLoaded = (documentEnvelope) => {
+    this.setState({ documentEnvelope });
   };
 
   render() {
@@ -58,7 +58,7 @@ class App extends Component {
                   onUserLoad={ this.onUserLoad }
                   queryParams={ props.location }/>
                 <PageBody
-                  documentStatus={ this.state.documentStatus }
+                  documentEnvelope={ this.state.documentEnvelope }
                   user={ this.state.user }/>
                 <Modal
                   header="Sign document"

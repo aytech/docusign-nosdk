@@ -9,18 +9,20 @@ export default class PageBody extends Component {
       lastName: '',
       email: ''
     };
-    const defaultDocumentStatus = {
+    const defaultEnvelope = {
       envelopeId: '',
       createdDateTime: '',
       status: ''
     };
-    let { user, documentStatus } = this.props;
+
+    let { user, documentEnvelope: { envelope, tenantId } } = this.props;
 
     if (user === undefined || user === null) {
       user = defaultUser;
     }
-    if (documentStatus === undefined || documentStatus === null) {
-      documentStatus = defaultDocumentStatus;
+
+    if (envelope === undefined || envelope === null) {
+      envelope = defaultEnvelope;
     }
 
     return (
@@ -57,15 +59,15 @@ export default class PageBody extends Component {
                 <tbody>
                 <tr>
                   <th scope="row">ID:</th>
-                  <td>{ documentStatus.envelopeId }</td>
-                </tr>
-                <tr>
-                  <th scope="row">Created:</th>
-                  <td>{ documentStatus.createdDateTime }</td>
+                  <td>{ envelope.envelopeId }</td>
                 </tr>
                 <tr>
                   <th scope="row">Status:</th>
-                  <td>{ documentStatus.status }</td>
+                  <td>{ envelope.status }</td>
+                </tr>
+                <tr>
+                  <th scope="row">Tenant:</th>
+                  <td>{ tenantId }</td>
                 </tr>
                 </tbody>
               </table>

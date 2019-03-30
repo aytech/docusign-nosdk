@@ -222,6 +222,8 @@ public class DocuSignController {
         usersApi.setApiClient(apiClient);
         List<User> users = new ArrayList<>();
         for (UserInformation userInformation : usersApi.list(accountID).getUsers()) {
+            System.out.println("Account ID: " + accountID);
+            System.out.println("USer: " + userInformation);
             if (!userInformation.getUserId().equals(currentUserId)) {
                 User user = new User();
                 user.setId(userInformation.getUserId());
@@ -231,6 +233,7 @@ public class DocuSignController {
                 users.add(user);
             }
         }
+        System.out.println("Users: " + users);
         return users;
     }
 }

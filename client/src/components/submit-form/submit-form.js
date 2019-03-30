@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import './submit-form.css';
 import Button from "../button/button";
 import Label from "../label/label";
@@ -26,7 +26,7 @@ export default class SubmitForm extends Component {
   };
 
   validateRecipient = (callback) => {
-    const { user } = this.state;
+    const {user} = this.state;
     if (user.name === '' || user.email === '') {
       this.setState({
         error: true,
@@ -41,8 +41,8 @@ export default class SubmitForm extends Component {
   };
 
   signDocument = () => {
-    this.setState({ loading: true });
-    const { subject, user: { email, name } } = this.state;
+    this.setState({loading: true});
+    const {subject, user: {email, name}} = this.state;
 
     console.log('Submit: ', subject, email, name);
 
@@ -89,18 +89,25 @@ export default class SubmitForm extends Component {
   };
 
   updateRecipient = (event) => {
-    let formUser = this.defaultUser;
-    for (const user of this.props.users) {
-      if (user.id === event.target.value) {
-        formUser = {
-          name: `${ user.firstName } ${ user.lastName }`,
-          email: user.email
-        }
-      }
-    }
     this.setState({
-      user: formUser
-    }, this.validateRecipient);
+      user: {
+        name: "Oleg Yapparov",
+        email: event.target.value
+      }
+    })
+    // console.log(event.target.value);
+    // let formUser = this.defaultUser;
+    // for (const user of this.props.users) {
+    //   if (user.id === event.target.value) {
+    //     formUser = {
+    //       name: `${user.firstName} ${user.lastName}`,
+    //       email: user.email
+    //     }
+    //   }
+    // }
+    // this.setState({
+    //   user: formUser
+    // }, this.validateRecipient);
   };
 
   render() {
@@ -112,23 +119,24 @@ export default class SubmitForm extends Component {
       success,
       successMessage
     } = this.state;
-    const userElements = [<option key={ 0 }>Select recipient</option>];
+    const userElements = [<option key={0}>Select recipient</option>];
     for (const user of this.props.users) {
       userElements.push(
         <option
-          key={ user.id }
-          value={ user.id }>
-          { user.firstName } { user.lastName }
+          key={user.id}
+          value={user.id}>
+          {user.firstName} {user.lastName}
         </option>
       );
     }
     return (
-      <form onSubmit={ this.submitForm }>
+      <form onSubmit={this.submitForm}>
         <div className="form-group">
           <Label for="recipient" text="Select recipient"/>
+          <input type="text" className="form-control" onChange={this.updateRecipient}/>
           <select className="form-control"
-                  onChange={ this.updateRecipient }>
-            { userElements }
+                  onChange={this.updateRecipient}>
+            {userElements}
           </select>
         </div>
         <div className="form-group">
@@ -138,26 +146,26 @@ export default class SubmitForm extends Component {
             rows="3"
             id="subject"
             placeholder="Subject"
-            value={ subject }
-            onChange={ this.updateSubject }/>
+            value={subject}
+            onChange={this.updateSubject}/>
         </div>
-        { error === true &&
+        {error === true &&
         <div
           className="alert alert-danger"
           role="alert">
-          { errorMessage }
+          {errorMessage}
         </div>
         }
-        { success === true &&
+        {success === true &&
         <div
           className="alert alert-success"
           role="alert">
-          { successMessage }
+          {successMessage}
         </div>
         }
         <Button
-          loading={ loading }
-          disabled={ error === true || loading === true }/>
+          loading={loading}
+          disabled={error === true || loading === true}/>
       </form>
     );
   }

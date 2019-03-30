@@ -1,5 +1,7 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import './page-header.css';
+import SubmitForm from "../submit-form/submit-form";
+import Modal from "../modal/modal";
 
 export default class PageHeader extends Component {
 
@@ -15,7 +17,7 @@ export default class PageHeader extends Component {
   };
 
   componentWillMount() {
-    const { queryParams: { search } } = this.props;
+    const {queryParams: {search}} = this.props;
 
     if (search.indexOf('code')) {
       const indexStart = search.indexOf('=') + 1;
@@ -32,7 +34,7 @@ export default class PageHeader extends Component {
 
   componentDidMount() {
 
-    const { onUserLoad } = this.props;
+    const {onUserLoad} = this.props;
 
     fetch('/api/auth/authenticated', {
       method: 'GET',
@@ -59,7 +61,7 @@ export default class PageHeader extends Component {
       });
   }
 
-  authenticate(userId) {
+  authenticateJwt(userId) {
     this.setState({
       loading: true
     });
@@ -85,12 +87,28 @@ export default class PageHeader extends Component {
       });
   }
 
+  authenticateAuth() {
+    this.setState({
+      loading: true
+    });
+    const host = window.location.hostname;
+    const port = window.location.port;
+    fetch('/api/auth/code/' + encodeURIComponent(host + ':' + port))
+      .then((response) => {
+        this.setState({loading: false});
+        return response.json();
+      })
+      .then(data => {
+        window.location.href = decodeURIComponent(data);
+      });
+  }
+
   fetchStatus = () => {
-    this.setState({ loading: true });
-    const { onDocumentStatusLoaded } = this.props;
+    this.setState({loading: true});
+    const {onDocumentStatusLoaded} = this.props;
     fetch('/api/document/status')
       .then((response) => {
-        this.setState({ loading: false });
+        this.setState({loading: false});
         return response.json();
       })
       .then(data => {
@@ -102,27 +120,15 @@ export default class PageHeader extends Component {
   };
 
   authenticateAdmin = () => {
-    return this.authenticate(this.users.admin)
+    return this.authenticateJwt(this.users.admin)
   };
 
   authenticateGmail = () => {
-    return this.authenticate(this.users.gmail)
+    return this.authenticateAuth();
   };
 
   authenticateSeznam = () => {
-    this.setState({
-      loading: true
-    });
-    const host = window.location.hostname;
-    const port = window.location.port;
-    fetch('/api/auth/code/' + encodeURIComponent(host + ':' + port))
-      .then((response) => {
-        this.setState({ loading: false });
-        return response.json();
-      })
-      .then(data => {
-        window.location.href = decodeURIComponent(data);
-      });
+    return this.authenticateAuth();
   };
 
   render() {
@@ -132,19 +138,19 @@ export default class PageHeader extends Component {
         <i className="fas fa-sync fa-spin"/>
       </div>
     );
-    const { onSignDocument } = this.props;
+    const {onSignDocument} = this.props;
 
     if (this.state.loading !== true && !this.state.authenticated) {
       markup = (
         <React.Fragment>
-          <button type='button' className='btn btn-primary btn-sm' onClick={ this.authenticateAdmin }>
-            Sign as Oleg Infor
+          <button type='button' className='btn btn-primary btn-sm' onClick={this.authenticateAdmin}>
+            Login (JWT)
           </button>
-          <button type='button' className='btn btn-primary btn-sm' onClick={ this.authenticateGmail }>
-            Sign as Oleg Gmail
+          <button type='button' className='btn btn-primary btn-sm' onClick={this.authenticateGmail}>
+            Login (Modal)
           </button>
-          <button type='button' className='btn btn-primary btn-sm' onClick={ this.authenticateSeznam }>
-            Auth Code Grant
+          <button type='button' className='btn btn-primary btn-sm' onClick={this.authenticateSeznam}>
+            Login
           </button>
         </React.Fragment>
       );
@@ -153,10 +159,10 @@ export default class PageHeader extends Component {
     if (this.state.loading !== true && this.state.authenticated) {
       markup = (
         <React.Fragment>
-          <button type='button' className='btn btn-primary btn-sm' onClick={ onSignDocument }>
+          <button type='button' className='btn btn-primary btn-sm' onClick={onSignDocument}>
             Sign document
           </button>
-          <button type="button" className="btn btn-primary btn-sm" onClick={ this.fetchStatus }>
+          <button type="button" className="btn btn-primary btn-sm" onClick={this.fetchStatus}>
             Get status
           </button>
         </React.Fragment>
@@ -169,7 +175,7 @@ export default class PageHeader extends Component {
           <span className='file-name'>Resource file - <strong>demo_document.pdf</strong></span>
         </div>
         <div className="col-xs-12 col-lg-5">
-          { markup }
+          {markup}
         </div>
       </div>
     );

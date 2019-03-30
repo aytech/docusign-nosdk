@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import React, {Component} from 'react';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import Iframe from 'react-iframe';
 import SubmitForm from "../submit-form/submit-form";
 import Footer from "../footer/footer";
 import Modal from "../modal/modal";
@@ -42,37 +43,49 @@ class App extends Component {
   };
 
   onDocumentStatusLoaded = (documentEnvelope) => {
-    this.setState({ documentEnvelope });
+    this.setState({documentEnvelope});
   };
 
   render() {
     return (
       <BrowserRouter>
         <Switch>
-          <Route path='/' render={ (props) => {
+          <Route path='/' render={(props) => {
             return (
               <div className='container main'>
                 <PageHeader
-                  onDocumentStatusLoaded={ this.onDocumentStatusLoaded }
-                  onSignDocument={ this.openSignDocumentModal }
-                  onUserLoad={ this.onUserLoad }
-                  queryParams={ props.location }/>
+                  onDocumentStatusLoaded={this.onDocumentStatusLoaded}
+                  onSignDocument={this.openSignDocumentModal}
+                  onUserLoad={this.onUserLoad}
+                  queryParams={props.location}/>
                 <PageBody
-                  documentEnvelope={ this.state.documentEnvelope }
-                  user={ this.state.user }/>
+                  documentEnvelope={this.state.documentEnvelope}
+                  user={this.state.user}/>
                 <Modal
                   header="Sign document"
-                  show={ this.state.signModalOpen === true }
-                  onClose={ this.closeSignDocumentModal }>
+                  show={this.state.signModalOpen === true}
+                  onClose={this.closeSignDocumentModal}>
                   <SubmitForm
-                    users={ this.state.users }
-                    onDocumentSubmit={ this.onDocumentSubmit }/>
+                    users={this.state.users}
+                    onDocumentSubmit={this.onDocumentSubmit}/>
+                </Modal>
+                <Modal
+                  header="Login to DocuSign"
+                  show={true}
+                  onClose={() => {
+                    console.log('Closing');
+                  }}>
+                  <Iframe
+                    url="https://www.google.com"
+                    position="absolute"
+                    width="100%"
+                    height="100%"/>
                 </Modal>
                 <Footer/>
               </div>
             )
-          } } exact={ true }/>
-          <Route render={ () => <h2>Page not found!</h2> }/>
+          }} exact={true}/>
+          <Route render={() => <h2>Page not found!</h2>}/>
         </Switch>
       </BrowserRouter>
     );

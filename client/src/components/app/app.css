@@ -15,6 +15,7 @@ p {
 
 .container {
   flex: 1 0 auto;
+  min-width: 450px;
 }
 
 .main {

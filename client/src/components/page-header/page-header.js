@@ -150,7 +150,7 @@ export default class PageHeader extends Component {
         <i className="fas fa-sync fa-spin"/>
       </div>
     );
-    const { onSignDocument } = this.props;
+    const { onSignDocument, onSenderView } = this.props;
 
     if (this.state.loading !== true && !this.state.authenticated) {
       markup = (
@@ -173,6 +173,9 @@ export default class PageHeader extends Component {
         <React.Fragment>
           <button type='button' className='btn btn-primary btn-sm' onClick={ onSignDocument }>
             Sign document
+          </button>
+          <button type='button' className='btn btn-primary btn-sm' onClick={ onSenderView }>
+            Sign with Sender View
           </button>
           <button type="button" className="btn btn-primary btn-sm" onClick={ this.fetchStatus }>
             Get status

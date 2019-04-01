@@ -15,39 +15,37 @@ class App extends Component {
     documentEnvelope: {},
     iframeModalOpen: false,
     iframeUrl: '',
+    senderView: false,
     signModalOpen: false,
     user: null,
     users: null
   };
 
   closeIframeModal = () => {
-    this.setState({
-      iframeModalOpen: false
-    });
+    this.setState({ iframeModalOpen: false });
   };
 
   openSignDocumentModal = () => {
-    this.setState({
-      signModalOpen: true
-    });
+    this.setState({ signModalOpen: true });
   };
 
   closeSignDocumentModal = () => {
-    this.setState({
-      signModalOpen: false
-    });
+    this.setState({ signModalOpen: false });
+  };
+
+  openSenderView = (url) => {
+    window.open(url, '_blank');
   };
 
   onDocumentSubmit = () => {
     this.setState({
-      signModalOpen: false,
+      senderView: false,
+      signModalOpen: false
     });
   };
 
   onUserLoad = (user, users) => {
-    this.setState({
-      user, users
-    });
+    this.setState({ user, users });
   };
 
   onDocumentStatusLoaded = (documentEnvelope) => {
@@ -59,7 +57,13 @@ class App extends Component {
       iframeModalOpen: true,
       iframeUrl: url
     });
-    console.log('Opening modal: ', url);
+  };
+
+  onSenderView = () => {
+    this.setState({
+      senderView: true,
+      signModalOpen: true
+    });
   };
 
   render() {
@@ -73,6 +77,7 @@ class App extends Component {
                   onDocumentStatusLoaded={ this.onDocumentStatusLoaded }
                   onIframeLogin={ this.onIframeLogin }
                   onSignDocument={ this.openSignDocumentModal }
+                  onSenderView={ this.onSenderView }
                   onUserLoad={ this.onUserLoad }
                   queryParams={ props.location }/>
                 <PageBody
@@ -84,7 +89,9 @@ class App extends Component {
                   onClose={ this.closeSignDocumentModal }>
                   <SubmitForm
                     users={ this.state.users }
-                    onDocumentSubmit={ this.onDocumentSubmit }/>
+                    senderView={ this.state.senderView }
+                    onDocumentSubmit={ this.onDocumentSubmit }
+                    openSenderView={ this.openSenderView }/>
                 </Modal>
                 <Modal
                   header="Login to DocuSign"

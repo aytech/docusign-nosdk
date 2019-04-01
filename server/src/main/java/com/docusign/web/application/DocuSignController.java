@@ -1,9 +1,7 @@
 package com.docusign.web.application;
 
-import com.docusign.data.InforEnvelope;
-import com.docusign.data.SignRequest;
+import com.docusign.data.*;
 import com.docusign.data.User;
-import com.docusign.data.UserResponse;
 import com.docusign.esign.api.EnvelopesApi;
 import com.docusign.esign.api.TemplatesApi;
 import com.docusign.esign.api.UsersApi;
@@ -131,7 +129,7 @@ public class DocuSignController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "sign")
-    public HttpEntity<EnvelopeSummary> signDocument(@RequestBody SignRequest request) throws IOException, ApiException {
+    public HttpEntity<EnvelopeResponse> signDocument(@RequestBody SignRequest request) throws IOException, ApiException {
 
         EnvelopeTemplate envelopeTemplate = new EnvelopeTemplate();
 
@@ -183,10 +181,19 @@ public class DocuSignController {
         envelopeDefinition.setStatus("sent");
 
         try {
+            EnvelopeResponse envelopeResponse = new EnvelopeResponse();
             EnvelopesApi envelopesApi = new EnvelopesApi();
+            ReturnUrlRequest returnUrlRequest = new ReturnUrlRequest();
+            returnUrlRequest.setReturnUrl("https://appdemo.docusign.com/home");
+
             EnvelopeSummary envelopeSummary = envelopesApi.createEnvelope(accountID, envelopeDefinition);
             envelopeID = envelopeSummary.getEnvelopeId();
-            return new ResponseEntity<>(envelopeSummary, HttpStatus.OK);
+            ViewUrl senderView = envelopesApi.createSenderView(accountID, envelopeID, returnUrlRequest);
+
+            envelopeResponse.setEnvelopeSummary(envelopeSummary);
+            envelopeResponse.setSenderView(senderView);
+
+            return new ResponseEntity<>(envelopeResponse, HttpStatus.OK);
         } catch (ApiException ex) {
             ex.printStackTrace();
             System.out.println("Error creating envelope: " + ex.getMessage());

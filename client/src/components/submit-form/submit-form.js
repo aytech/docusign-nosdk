@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import './submit-form.css';
 import Button from "../button/button";
 import Label from "../label/label";
@@ -6,8 +6,8 @@ import Label from "../label/label";
 export default class SubmitForm extends Component {
 
   defaultUser = {
-    name: '',
-    email: ''
+    name: 'Oleg Yapparov',
+    email: 'oleg.yapparov@infor.com'
   };
   state = {
     authenticated: false,
@@ -26,11 +26,11 @@ export default class SubmitForm extends Component {
   };
 
   validateRecipient = (callback) => {
-    const {user} = this.state;
+    const { user } = this.state;
     if (user.name === '' || user.email === '') {
       this.setState({
         error: true,
-        errorMessage: 'Please select recipient'
+        errorMessage: 'Please add or select recipient'
       });
     } else {
       this.setState({
@@ -41,10 +41,9 @@ export default class SubmitForm extends Component {
   };
 
   signDocument = () => {
-    this.setState({loading: true});
-    const {subject, user: {email, name}} = this.state;
-
-    console.log('Submit: ', subject, email, name);
+    this.setState({ loading: true });
+    const { subject, user: { email, name } } = this.state;
+    const { senderView, openSenderView } = this.props;
 
     fetch('/api/sign', {
       body: JSON.stringify({
@@ -79,6 +78,12 @@ export default class SubmitForm extends Component {
           successMessage,
           loading: false
         });
+        return response.json();
+      })
+      .then((data) => {
+        if (senderView === true) {
+          openSenderView(data.senderView.url);
+        }
       });
   };
 
@@ -88,26 +93,43 @@ export default class SubmitForm extends Component {
     });
   };
 
-  updateRecipient = (event) => {
-    this.setState({
-      user: {
-        name: "Oleg Yapparov",
-        email: event.target.value
+  selectRecipient = (event) => {
+    let formUser = this.defaultUser;
+    for (const user of this.props.users) {
+      if (user.id === event.target.value) {
+        formUser = {
+          name: `${ user.firstName } ${ user.lastName }`,
+          email: user.email
+        }
       }
-    })
-    // console.log(event.target.value);
-    // let formUser = this.defaultUser;
-    // for (const user of this.props.users) {
-    //   if (user.id === event.target.value) {
-    //     formUser = {
-    //       name: `${user.firstName} ${user.lastName}`,
-    //       email: user.email
-    //     }
-    //   }
-    // }
-    // this.setState({
-    //   user: formUser
-    // }, this.validateRecipient);
+    }
+    this.setState({
+      user: formUser
+    }, this.validateRecipient);
+  };
+
+  updateRecipientName = (event) => {
+    const name = event.target.value;
+    this.setState(({ user }) => {
+      return {
+        user: {
+          name: name,
+          email: user.email
+        }
+      };
+    }, this.validateRecipient);
+  };
+
+  updateRecipientEmail = (event) => {
+    const email = event.target.value;
+    this.setState(({ user }) => {
+      return {
+        user: {
+          name: user.name,
+          email: email
+        }
+      };
+    }, this.validateRecipient);
   };
 
   render() {
@@ -119,24 +141,41 @@ export default class SubmitForm extends Component {
       success,
       successMessage
     } = this.state;
-    const userElements = [<option key={0}>Select recipient</option>];
+    const userElements = [<option key={ 0 }>Select recipient</option>];
     for (const user of this.props.users) {
       userElements.push(
         <option
-          key={user.id}
-          value={user.id}>
-          {user.firstName} {user.lastName}
+          key={ user.id }
+          value={ user.id }>
+          { user.firstName } { user.lastName }
         </option>
       );
     }
     return (
-      <form onSubmit={this.submitForm}>
+      <form onSubmit={ this.submitForm }>
         <div className="form-group">
-          <Label for="recipient" text="Select recipient"/>
-          <input type="text" className="form-control" onChange={this.updateRecipient}/>
-          <select className="form-control"
-                  onChange={this.updateRecipient}>
-            {userElements}
+          <Label for="name" text="Recipient name"/>
+          <input
+            id="name"
+            type="text"
+            className="form-control"
+            value={ this.state.user.name }
+            onChange={ this.updateRecipientName }/>
+          <Label for="email" text="Recipient email"/>
+          <input
+            id="email"
+            type="text"
+            className="form-control"
+            value={ this.state.user.email }
+            onChange={ this.updateRecipientEmail }/>
+        </div>
+        <div className="form-group">
+          <Label for="recipient" text="Or select recipient"/>
+          <select
+            id="recipient"
+            className="form-control"
+            onChange={ this.selectRecipient }>
+            { userElements }
           </select>
         </div>
         <div className="form-group">
@@ -146,26 +185,26 @@ export default class SubmitForm extends Component {
             rows="3"
             id="subject"
             placeholder="Subject"
-            value={subject}
-            onChange={this.updateSubject}/>
+            value={ subject }
+            onChange={ this.updateSubject }/>
         </div>
-        {error === true &&
+        { error === true &&
         <div
           className="alert alert-danger"
           role="alert">
-          {errorMessage}
+          { errorMessage }
         </div>
         }
-        {success === true &&
+        { success === true &&
         <div
           className="alert alert-success"
           role="alert">
-          {successMessage}
+          { successMessage }
         </div>
         }
         <Button
-          loading={loading}
-          disabled={error === true || loading === true}/>
+          loading={ loading }
+          disabled={ error === true || loading === true }/>
       </form>
     );
   }

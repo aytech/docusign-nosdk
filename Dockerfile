@@ -1,7 +1,5 @@
-
 # Stage 1 - build UI
 FROM node:alpine as node
-
 WORKDIR '/app'
 COPY client/package.json .
 RUN npm install
@@ -11,7 +9,6 @@ RUN npm run build
 
 # Stage 2 - build server
 FROM openjdk:8-jdk-alpine as server
-
 WORKDIR '/app'
 COPY server/gradle gradle
 COPY server/src src
@@ -23,6 +20,7 @@ RUN ./gradlew build
 
 # Stage 3 - run the app
 FROM openjdk:8-jdk-alpine
+LABEL maintainer="Oleg Yapparov <oleg.yapparov@infor.com>"
 VOLUME /tmp
 COPY --from=server /app/build/libs/docusign-app-0.1.0.jar .
 ENTRYPOINT ["java","-jar","docusign-app-0.1.0.jar"]

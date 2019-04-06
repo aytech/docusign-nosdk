@@ -20,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 
@@ -45,26 +42,26 @@ public class DocuSignController {
         Configuration.setDefaultApiClient(apiClient);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "auth/code/{redirectUrl}")
-    public HttpEntity<URI> getCodeGrantAuthURL(@PathVariable("redirectUrl") String redirectUrl) throws UnsupportedEncodingException {
+    @RequestMapping(method = RequestMethod.GET, value = "auth/code")
+    public HttpEntity<URI> getCodeGrantAuthURL() {
         String randomState = "state_random_string";
-        String redirect = String.format("http://%s", URLDecoder.decode(redirectUrl, StandardCharsets.UTF_8.name()));
         List<String> scopes = new ArrayList<>();
-
         scopes.add(OAuth.Scope_SIGNATURE);
-        URI oauthLoginUrl = apiClient.getAuthorizationUri(integratorKey, scopes, redirect, OAuth.CODE, randomState);
+
+        URI oauthLoginUrl = apiClient.getAuthorizationUri(integratorKey, scopes, REDIRECT_URI, OAuth.CODE, randomState);
 
         return new ResponseEntity<>(oauthLoginUrl, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "auth/grant/{code}")
-    public HttpEntity<Void> authenticateWithCodeGrant(@PathVariable("code") String code) {
+    public HttpEntity<OAuth.OAuthToken> authenticateWithCodeGrant(@PathVariable("code") String code) {
         String clientSecret = "c2c4519e-161f-45ea-b1ae-20f947125e82";
         try {
             OAuth.OAuthToken oAuthToken = apiClient.generateAccessToken(integratorKey, clientSecret, code);
             System.out.println("Oauth Token: " + oAuthToken);
             apiClient.setAccessToken(oAuthToken.getAccessToken(), oAuthToken.getExpiresIn());
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            apiClient.addDefaultHeader("Authorization", "Bearer " + oAuthToken.getAccessToken());
+            return new ResponseEntity<>(oAuthToken, HttpStatus.OK);
         } catch (ApiException | IOException e) {
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -188,10 +185,12 @@ public class DocuSignController {
 
             EnvelopeSummary envelopeSummary = envelopesApi.createEnvelope(accountID, envelopeDefinition);
             envelopeID = envelopeSummary.getEnvelopeId();
-            ViewUrl senderView = envelopesApi.createSenderView(accountID, envelopeID, returnUrlRequest);
+
+            ConsoleViewRequest viewRequest = makeConsoleViewRequest();
+            ViewUrl senderView = envelopesApi.createConsoleView(accountID, viewRequest);
 
             envelopeResponse.setEnvelopeSummary(envelopeSummary);
-            envelopeResponse.setSenderView(senderView);
+            envelopeResponse.setSenderViewUrl(senderView.getUrl());
 
             return new ResponseEntity<>(envelopeResponse, HttpStatus.OK);
         } catch (ApiException ex) {
@@ -199,6 +198,13 @@ public class DocuSignController {
             System.out.println("Error creating envelope: " + ex.getMessage());
             return new ResponseEntity<>(null, HttpStatus.SERVICE_UNAVAILABLE);
         }
+    }
+
+    private ConsoleViewRequest makeConsoleViewRequest() {
+        ConsoleViewRequest viewRequest = new ConsoleViewRequest();
+        viewRequest.setReturnUrl("http://localhost:3000/ds-return");
+        viewRequest.setEnvelopeId(envelopeID);
+        return viewRequest;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "document/status")

@@ -82,7 +82,7 @@ export default class SubmitForm extends Component {
       })
       .then((data) => {
         if (senderView === true) {
-          openSenderView(data.senderView.url);
+          openSenderView(data.senderViewUrl);
         }
       });
   };

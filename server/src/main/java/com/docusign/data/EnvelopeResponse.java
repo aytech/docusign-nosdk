@@ -1,11 +1,10 @@
 package com.docusign.data;
 
 import com.docusign.esign.model.EnvelopeSummary;
-import com.docusign.esign.model.ViewUrl;
 
 public class EnvelopeResponse {
     private EnvelopeSummary envelopeSummary;
-    private ViewUrl senderView;
+    private String senderViewUrl;
 
     public EnvelopeSummary getEnvelopeSummary() {
         return envelopeSummary;
@@ -15,11 +14,11 @@ public class EnvelopeResponse {
         this.envelopeSummary = envelopeSummary;
     }
 
-    public ViewUrl getSenderView() {
-        return senderView;
+    public String getSenderViewUrl() {
+        return senderViewUrl;
     }
 
-    public void setSenderView(ViewUrl senderView) {
-        this.senderView = senderView;
+    public void setSenderViewUrl(String senderViewUrl) {
+        this.senderViewUrl = senderViewUrl;
     }
 }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './page-header.css';
+import DocuSignService from "../../services/DocuSignService";
 
 export default class PageHeader extends Component {
 
@@ -12,32 +13,14 @@ export default class PageHeader extends Component {
     loading: false
   };
 
+  docuSignService = new DocuSignService();
+
   componentWillMount() {
-    const { queryParams: { search } } = this.props;
-
-    if (window.opener === null) {
-      window.addEventListener('message', (event) => {
-        if (event.data === 'authenticated') {
-          this.fetchAuthStatus();
-        }
-      }, false);
-    }
-
-    if (search.indexOf('code') !== -1) {
-      const indexStart = search.indexOf('=') + 1;
-      const indexEnd = search.indexOf('&');
-      const code = search.substring(indexStart, indexEnd);
-
-      fetch('/api/auth/grant/' + code)
-        .then((response) => {
-          if (response.status === 200) {
-            if (window.opener !== null) {
-              window.opener.postMessage('authenticated', '*');
-            }
-            window.close();
-          }
-        });
-    }
+    window.addEventListener('message', (event) => {
+      if (event.data === 'authenticated') {
+        this.fetchAuthStatus();
+      }
+    }, false);
   }
 
   componentDidMount() {
@@ -48,29 +31,23 @@ export default class PageHeader extends Component {
     this.setState({ loading: true });
     const { onUserLoad } = this.props;
 
-    fetch('/api/auth/authenticated', {
-      method: 'GET',
-      mode: 'cors'
-    })
-      .then(response => {
-        const authenticated = response.status === 200;
+    this.docuSignService
+      .isUserAuthenticated()
+      .then(data => {
         this.setState({
-          authenticated: authenticated,
+          authenticated: true,
           loading: false
         });
-        if (authenticated) {
-          return response.json();
-        }
-      })
-      .then(data => {
         if (data !== undefined) {
           // noinspection JSUnresolvedVariable
           onUserLoad(data.userInfo, data.users);
         }
       })
-      .catch((error) => {
-        console.log('Error: ', error);
-        this.setState({ loading: false });
+      .catch(() => {
+        this.setState({
+          authenticated: false,
+          loading: false
+        });
       });
   };
 
@@ -104,14 +81,10 @@ export default class PageHeader extends Component {
     this.setState({
       loading: true
     });
-    const host = window.location.hostname;
-    const port = window.location.port;
-    fetch('/api/auth/code/' + encodeURIComponent(host + ':' + port))
-      .then((response) => {
-        this.setState({ loading: false });
-        return response.json();
-      })
+    this.docuSignService
+      .getAuthenticationCode()
       .then(data => {
+        this.setState({ loading: false });
         callback(data);
       });
   };

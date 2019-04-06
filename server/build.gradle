@@ -19,7 +19,7 @@ bootJar {
     version =  '0.1.0'
 }
 
-group = 'com.hellosign'
+group = 'com.docusign'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -38,7 +38,7 @@ configurations {
 
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
-    implementation('com.docusign:docusign-esign-java:2.7.0')
+    implementation('com.docusign:docusign-esign-java:2.9.0')
     // Apache Commons IO
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
     // Dev

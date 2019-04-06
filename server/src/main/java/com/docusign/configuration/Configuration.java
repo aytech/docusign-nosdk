@@ -9,7 +9,7 @@ public class Configuration {
 
     // configure the authorization flow on the api client,
     // this must match a redirect URI (case-sensitive) configured on the key
-    public final static String REDIRECT_URI = "http://localhost:8080";
+    public final static String REDIRECT_URI = "http://localhost:3000/ds-return";
 
     public final static String INFOR_BRAND_ID = "4c7bbcc1-65ad-4326-bf51-34595a55f7fa";
 }

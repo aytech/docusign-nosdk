@@ -16,11 +16,11 @@ class Modal extends React.Component {
       iframe
     } = this.props;
 
-    const modalBodyClass = iframe ? 'modal-body iframe' : 'modal-body';
+    const modalClass = iframe ? 'modal-container iframe' : 'modal-container';
 
     return (
       <div className="backdrop">
-        <div className="modal-container">
+        <div className={ modalClass }>
           <div className="modal-header">
             <h2>{ header }</h2>
             <button
@@ -32,7 +32,7 @@ class Modal extends React.Component {
               <span aria-hidden="true">×</span>
             </button>
           </div>
-          <div className={ modalBodyClass }>
+          <div className="modal-body">
             { children }
           </div>
         </div>

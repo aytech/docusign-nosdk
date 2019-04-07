@@ -1,6 +1,7 @@
 export default class DocuSignService {
 
   apiBase = '/api';
+  jwtUserId = '8f4c470f-1a52-41ff-a86f-7f5dfa92ce16';
 
   async getResource(url, headers) {
     const resource = await fetch(`${ this.apiBase }${ url }`, headers);
@@ -14,8 +15,16 @@ export default class DocuSignService {
     return await this.getResource(`/auth/grant/${ authCode }`);
   };
 
+  authenticateJWT = async () => {
+    return await this.getResource(`/auth/jwt/${ this.jwtUserId }`);
+  };
+
   getAuthenticationCode = async () => {
     return await this.getResource('/auth/code');
+  };
+
+  getDocumentStatus = async () => {
+    return await this.getResource('/document/status');
   };
 
   isUserAuthenticated = async () => {

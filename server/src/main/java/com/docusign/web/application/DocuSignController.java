@@ -114,10 +114,15 @@ public class DocuSignController {
         try {
             OAuth.UserInfo userInfo = apiClient.getUserInfo(apiClient.getAccessToken());
             accountID = userInfo.getAccounts().get(0).getAccountId();
+
             User user = getUserFromUserInfo(userInfo);
             UserResponse response = new UserResponse();
+
             response.setUserInfo(user);
             response.setUsers(retrieveSystemUsers(user.getId()));
+
+            response.setTemplates(retrieveUserTemplates());
+
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (ApiException e) {
             System.out.println("User not authenticated: " + e.getMessage());
@@ -127,8 +132,6 @@ public class DocuSignController {
 
     @RequestMapping(method = RequestMethod.POST, value = "sign")
     public HttpEntity<EnvelopeResponse> signDocument(@RequestBody SignRequest request) throws IOException, ApiException {
-
-        EnvelopeTemplate envelopeTemplate = new EnvelopeTemplate();
 
         Document document = new Document();
         InputStream documentFile = new ClassPathResource("static/demo_document.pdf").getInputStream();
@@ -140,15 +143,12 @@ public class DocuSignController {
         List<Document> documents = new ArrayList<>();
         documents.add(document);
 
-        envelopeTemplate.setDocuments(documents);
-        envelopeTemplate.setBrandId(INFOR_BRAND_ID);
-        envelopeTemplate.setEmailSubject(request.getSubject());
+        if (request.isCreateTemplate()) {
 
-        EnvelopeTemplateDefinition envelopeTemplateDefinition = new EnvelopeTemplateDefinition();
-        envelopeTemplate.setEnvelopeTemplateDefinition(envelopeTemplateDefinition);
-
-        TemplatesApi templatesApi = new TemplatesApi();
-        TemplateSummary templateSummary = templatesApi.createTemplate(accountID, envelopeTemplate);
+            TemplateSummary templateSummary = createTemplate(documents, request);
+            request.setTemplateId(templateSummary.getTemplateId());
+            System.out.println("Summary: " + templateSummary);
+        }
 
         CustomFields customFields = new CustomFields();
         List<TextCustomField> fields = new ArrayList<>();
@@ -161,18 +161,18 @@ public class DocuSignController {
         // create a new envelope to manage the signature request
         EnvelopeDefinition envelopeDefinition = new EnvelopeDefinition();
         envelopeDefinition.setEmailSubject(request.getSubject());
-        envelopeDefinition.setTemplateId(templateSummary.getTemplateId());
+        envelopeDefinition.setTemplateId(request.getTemplateId());
         envelopeDefinition.setCustomFields(customFields);
 
-        TemplateRole templateRole = new TemplateRole();
-        templateRole.setRoleName(request.getName());
-        templateRole.setName(request.getName());
-        templateRole.setEmail(request.getEmail());
-
-        List<TemplateRole> templateRoles = new ArrayList<>();
-        templateRoles.add(templateRole);
-
-        envelopeDefinition.setTemplateRoles(templateRoles);
+//        TemplateRole templateRole = new TemplateRole();
+//        templateRole.setRoleName(request.getName());
+//        templateRole.setName(request.getName());
+//        templateRole.setEmail(request.getEmail());
+//
+//        List<TemplateRole> templateRoles = new ArrayList<>();
+//        templateRoles.add(templateRole);
+//
+//        envelopeDefinition.setTemplateRoles(templateRoles);
 
         // send the envelope by setting |status| to "sent". To save as a draft set to "created"
         envelopeDefinition.setStatus("sent");
@@ -180,8 +180,6 @@ public class DocuSignController {
         try {
             EnvelopeResponse envelopeResponse = new EnvelopeResponse();
             EnvelopesApi envelopesApi = new EnvelopesApi();
-            ReturnUrlRequest returnUrlRequest = new ReturnUrlRequest();
-            returnUrlRequest.setReturnUrl("https://appdemo.docusign.com/home");
 
             EnvelopeSummary envelopeSummary = envelopesApi.createEnvelope(accountID, envelopeDefinition);
             envelopeID = envelopeSummary.getEnvelopeId();
@@ -235,8 +233,6 @@ public class DocuSignController {
         usersApi.setApiClient(apiClient);
         List<User> users = new ArrayList<>();
         for (UserInformation userInformation : usersApi.list(accountID).getUsers()) {
-            System.out.println("Account ID: " + accountID);
-            System.out.println("USer: " + userInformation);
             if (!userInformation.getUserId().equals(currentUserId)) {
                 User user = new User();
                 user.setId(userInformation.getUserId());
@@ -246,7 +242,38 @@ public class DocuSignController {
                 users.add(user);
             }
         }
-        System.out.println("Users: " + users);
         return users;
+    }
+
+    private List<Template> retrieveUserTemplates() throws ApiException {
+
+        TemplatesApi templatesApi = new TemplatesApi();
+        EnvelopeTemplateResults templateResults = templatesApi.listTemplates(accountID);
+        List<Template> templates = new ArrayList<>();
+
+        for (EnvelopeTemplateResult templateResult : templateResults.getEnvelopeTemplates()) {
+            System.out.println("Result: " + templateResult);
+            Template template = new Template();
+            template.setId(templateResult.getTemplateId());
+            template.setName(templateResult.getName());
+            templates.add(template);
+        }
+
+        return templates;
+    }
+
+    private TemplateSummary createTemplate(List<Document> documents, SignRequest request) throws ApiException {
+        EnvelopeTemplate envelopeTemplate = new EnvelopeTemplate();
+
+        envelopeTemplate.setDocuments(documents);
+        envelopeTemplate.setBrandId(INFOR_BRAND_ID);
+        envelopeTemplate.setEmailSubject(request.getSubject());
+
+        EnvelopeTemplateDefinition envelopeTemplateDefinition = new EnvelopeTemplateDefinition();
+        envelopeTemplateDefinition.setName(request.getTemplateName());
+        envelopeTemplate.setEnvelopeTemplateDefinition(envelopeTemplateDefinition);
+
+        TemplatesApi templatesApi = new TemplatesApi();
+        return templatesApi.createTemplate(accountID, envelopeTemplate);
     }
 }

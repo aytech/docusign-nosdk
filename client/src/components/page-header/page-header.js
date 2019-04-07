@@ -4,10 +4,6 @@ import DocuSignService from "../../services/DocuSignService";
 
 export default class PageHeader extends Component {
 
-  users = {
-    admin: '8f4c470f-1a52-41ff-a86f-7f5dfa92ce16'
-  };
-
   state = {
     authenticated: false,
     loading: false
@@ -18,64 +14,58 @@ export default class PageHeader extends Component {
   componentWillMount() {
     window.addEventListener('message', (event) => {
       if (event.data === 'authenticated') {
-        this.fetchAuthStatus();
+        this.getAuthStatus();
       }
     }, false);
   }
 
   componentDidMount() {
-    this.fetchAuthStatus();
+    this.getAuthStatus();
   }
 
-  fetchAuthStatus = () => {
-    this.setState({ loading: true });
+  authenticateUser = (data) => {
     const { onUserLoad } = this.props;
-
-    this.docuSignService
-      .isUserAuthenticated()
-      .then(data => {
-        this.setState({
-          authenticated: true,
-          loading: false
-        });
-        if (data !== undefined) {
-          // noinspection JSUnresolvedVariable
-          onUserLoad(data.userInfo, data.users);
-        }
-      })
-      .catch(() => {
-        this.setState({
-          authenticated: false,
-          loading: false
-        });
-      });
+    const { userInfo, users, templates } = data;
+    this.setState({
+      authenticated: true,
+      loading: false
+    });
+    onUserLoad(userInfo, users, templates);
   };
 
-  authenticateJwt() {
+  unAuthenticateUser = () => {
+    this.setState({
+      authenticated: false,
+      loading: false
+    });
+  };
+
+  getAuthStatus = () => {
+    this.setState({ loading: true });
+    this.docuSignService
+      .isUserAuthenticated()
+      .then(this.authenticateUser)
+      .catch(this.unAuthenticateUser);
+  };
+
+  authenticateJwt = () => {
     this.setState({
       loading: true
     });
 
-    fetch('/api/auth/jwt/' + this.users.admin)
-      .then((response) => {
-        const authenticated = response.status === 200;
-        this.setState({
-          authenticated: authenticated,
-          loading: false
-        });
-        return response.json();
-      })
+    this.docuSignService
+      .authenticateJWT()
       .then(data => {
         // noinspection JSUnresolvedVariable
-        if (data.userInfo === null && data.users === null) {
+        if (data.userInfo === null) {
           // noinspection JSUnresolvedVariable
           window.open(data.jwtUrl, '_blank');
         } else {
-          // noinspection JSUnresolvedVariable
-          this.props.onUserLoad(data.userInfo, data.users);
+          this.authenticateUser(data);
         }
-      });
-  }
+      })
+      .catch(this.unAuthenticateUser);
+  };
 
   authenticate = (callback) => {
     this.setState({
@@ -100,24 +90,26 @@ export default class PageHeader extends Component {
     });
   };
 
+  updateDocumentStatus = (data) => {
+    const { onDocumentStatusLoaded } = this.props;
+    this.setState({ loading: false });
+    onDocumentStatusLoaded(data);
+  };
+
+  updateDocumentStatusError = (error) => {
+    this.setState({ loading: false });
+    console.log('Could not get status: ', error);
+  };
+
   fetchStatus = () => {
     this.setState({ loading: true });
-    const { onDocumentStatusLoaded } = this.props;
-    fetch('/api/document/status')
-      .then((response) => {
-        this.setState({ loading: false });
-        return response.json();
-      })
-      .then(data => {
-        onDocumentStatusLoaded(data);
-      })
-      .catch(() => {
-        console.log('Could not get status');
-      });
+    this.docuSignService
+      .getDocumentStatus()
+      .then(this.updateDocumentStatus)
+      .catch(this.updateDocumentStatusError);
   };
 
   render() {
-
     let markup = (
       <div className="fa fa-2x inline">
         <i className="fas fa-sync fa-spin"/>

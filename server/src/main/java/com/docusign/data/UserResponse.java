@@ -1,9 +1,21 @@
 package com.docusign.data;
 
+import com.docusign.esign.model.EnvelopeTemplateResults;
+
 import java.util.List;
 
 public class UserResponse {
     private List<User> users;
+    private List<Template> templates;
+
+    public List<Template> getTemplates() {
+        return templates;
+    }
+
+    public void setTemplates(List<Template> templates) {
+        this.templates = templates;
+    }
+
     private User userInfo;
     private String jwtUrl;
     private String errorMessage;

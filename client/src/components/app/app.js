@@ -22,7 +22,8 @@ class App extends Component {
     senderViewUrl: '',
     signModalOpen: false,
     user: null,
-    users: null
+    users: null,
+    templates: null
   };
 
   componentWillMount() {
@@ -32,7 +33,6 @@ class App extends Component {
           iframeModalOpen: false
         })
       }
-      console.log('Message received: ', event);
     });
   }
 
@@ -68,8 +68,8 @@ class App extends Component {
     });
   };
 
-  onUserLoad = (user, users) => {
-    this.setState({ user, users });
+  onUserLoad = (user, users, templates) => {
+    this.setState({ user, users, templates });
   };
 
   onDocumentStatusLoaded = (documentEnvelope) => {
@@ -116,6 +116,7 @@ class App extends Component {
                     onClose={ this.closeSignDocumentModal }>
                     <SubmitForm
                       users={ this.state.users }
+                      templates={ this.state.templates }
                       senderView={ this.state.senderView }
                       onDocumentSubmit={ this.onDocumentSubmit }
                       openSenderView={ this.openSenderView }/>

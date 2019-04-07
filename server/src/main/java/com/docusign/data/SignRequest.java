@@ -5,6 +5,37 @@ public class SignRequest {
     private String name;
     private String subject;
     private String message;
+    private boolean createTemplate;
+    private String templateId;
+    private String templateName;
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
+    }
+
+    public boolean isCreateTemplate() {
+        return createTemplate;
+    }
+
+    public void setCreateTemplate(boolean createTemplate) {
+        this.createTemplate = createTemplate;
+    }
+
+    public String isTemplateId() {
+        return templateId;
+    }
+
+    public String getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
+    }
 
     public String getEmail() {
         return email;
@@ -44,6 +75,7 @@ public class SignRequest {
                 "email='" + email + '\'' +
                 ", name='" + name + '\'' +
                 ", subject='" + subject + '\'' +
+                ", createTemplate='" + createTemplate + '\'' +
                 ", message='" + message + '\'' +
                 '}';
     }

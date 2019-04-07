@@ -11,13 +11,24 @@ export default class SubmitForm extends Component {
   };
   state = {
     authenticated: false,
+    createTemplate: false,
     error: false,
     errorMessage: '',
     loading: false,
     subject: 'DocuSign Infor - Sample Signature Request',
     success: false,
     successMessage: '',
+    template: null,
+    templateName: '',
     user: this.defaultUser
+  };
+
+  toggleCreateTemplate = () => {
+    this.setState((currentState) => {
+      const newState = currentState;
+      newState.createTemplate = newState.createTemplate !== true;
+      return newState;
+    });
   };
 
   submitForm = (event) => {
@@ -42,14 +53,23 @@ export default class SubmitForm extends Component {
 
   signDocument = () => {
     this.setState({ loading: true });
-    const { subject, user: { email, name } } = this.state;
     const { senderView, openSenderView } = this.props;
+    const {
+      subject,
+      createTemplate,
+      template,
+      templateName,
+      user: { email, name }
+    } = this.state;
 
     fetch('/api/sign', {
       body: JSON.stringify({
         email,
         name,
-        subject
+        subject,
+        createTemplate,
+        template,
+        templateName
       }),
       headers: {
         'Content-Type': 'application/json'
@@ -93,6 +113,12 @@ export default class SubmitForm extends Component {
     });
   };
 
+  updateTemplate = (event) => {
+    this.setState({
+      template: event.target.value
+    });
+  };
+
   selectRecipient = (event) => {
     let formUser = this.defaultUser;
     for (const user of this.props.users) {
@@ -132,6 +158,12 @@ export default class SubmitForm extends Component {
     }, this.validateRecipient);
   };
 
+  updateTemplateName = (event) => {
+    this.setState({
+      templateName: event.target.value
+    });
+  };
+
   render() {
     const {
       error,
@@ -142,6 +174,7 @@ export default class SubmitForm extends Component {
       successMessage
     } = this.state;
     const userElements = [<option key={ 0 }>Select recipient</option>];
+    const templateElements = [<option key={ 0 }>Select template</option>];
     for (const user of this.props.users) {
       userElements.push(
         <option
@@ -151,42 +184,75 @@ export default class SubmitForm extends Component {
         </option>
       );
     }
+    for (const template of this.props.templates) {
+      templateElements.push(
+        <option
+          key={ template.id }
+          value={ template.id }>
+          { template.name }
+        </option>
+      );
+    }
     return (
       <form onSubmit={ this.submitForm }>
         <div className="form-group">
-          <Label for="name" text="Recipient name"/>
-          <input
-            id="name"
-            type="text"
-            className="form-control"
-            value={ this.state.user.name }
-            onChange={ this.updateRecipientName }/>
-          <Label for="email" text="Recipient email"/>
-          <input
-            id="email"
-            type="text"
-            className="form-control"
-            value={ this.state.user.email }
-            onChange={ this.updateRecipientEmail }/>
-        </div>
-        <div className="form-group">
-          <Label for="recipient" text="Or select recipient"/>
           <select
-            id="recipient"
+            id="template"
             className="form-control"
-            onChange={ this.selectRecipient }>
-            { userElements }
+            onChange={ this.updateTemplate }>
+            { templateElements }
           </select>
         </div>
-        <div className="form-group">
-          <Label for="subject" text="Subject"/>
-          <textarea
-            className="form-control"
-            rows="3"
-            id="subject"
-            placeholder="Subject"
-            value={ subject }
-            onChange={ this.updateSubject }/>
+        <div className="checkbox">
+          <label>
+            <input
+              type="checkbox"
+              onChange={ this.toggleCreateTemplate }
+              value={ this.state.createTemplate }/> Create template
+          </label>
+        </div>
+        <div>
+          <div className="form-group">
+            <Label for="templateName" text="Template name"/>
+            <input
+              id="templateName"
+              className="form-control"
+              value={ this.state.templateName }
+              onChange={ this.updateTemplateName }/>
+            <Label for="name" text="Recipient name"/>
+            <input
+              id="name"
+              type="text"
+              className="form-control"
+              value={ this.state.user.name }
+              onChange={ this.updateRecipientName }/>
+            <Label for="email" text="Recipient email"/>
+            <input
+              id="email"
+              type="text"
+              className="form-control"
+              value={ this.state.user.email }
+              onChange={ this.updateRecipientEmail }/>
+          </div>
+          <div className="form-group">
+            <Label for="recipient" text="Or select recipient"/>
+            <select
+              id="recipient"
+              className="form-control"
+              onChange={ this.selectRecipient }>
+              { userElements }
+            </select>
+          </div>
+          <div className="form-group">
+            <Label for="subject" text="Subject"/>
+            <textarea
+              className="form-control"
+              rows="3"
+              id="subject"
+              placeholder="Subject"
+              value={ subject }
+              onChange={ this.updateSubject }/>
+          </div>
         </div>
         { error === true &&
         <div

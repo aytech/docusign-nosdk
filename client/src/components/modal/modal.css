@@ -47,6 +47,10 @@
   padding: 0;
 }
 
+.modal-body label {
+  user-select: none;
+}
+
 @media (min-width: 576px) {
   .modal-container {
     max-width: 90%;

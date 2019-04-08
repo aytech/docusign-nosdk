@@ -4,11 +4,6 @@ import Button from "../button/button";
 import Label from "../label/label";
 
 export default class SubmitForm extends Component {
-
-  defaultUser = {
-    name: 'Oleg Yapparov',
-    email: 'oleg.yapparov@infor.com'
-  };
   state = {
     authenticated: false,
     createTemplate: false,
@@ -20,7 +15,7 @@ export default class SubmitForm extends Component {
     successMessage: '',
     template: null,
     templateName: '',
-    user: this.defaultUser
+    user: {}
   };
 
   toggleCreateTemplate = () => {
@@ -59,7 +54,7 @@ export default class SubmitForm extends Component {
       createTemplate,
       template,
       templateName,
-      user: { email, name }
+      user: { email, name, id }
     } = this.state;
 
     fetch('/api/sign', {
@@ -69,7 +64,8 @@ export default class SubmitForm extends Component {
         subject,
         createTemplate,
         template,
-        templateName
+        templateName,
+        userId: id
       }),
       headers: {
         'Content-Type': 'application/json'
@@ -120,18 +116,19 @@ export default class SubmitForm extends Component {
   };
 
   selectRecipient = (event) => {
-    let formUser = this.defaultUser;
     for (const user of this.props.users) {
       if (user.id === event.target.value) {
-        formUser = {
+        const formUser = {
+          id: user.id,
           name: `${ user.firstName } ${ user.lastName }`,
           email: user.email
-        }
+        };
+        this.setState({
+          user: formUser
+        }, this.validateRecipient);
+        return;
       }
     }
-    this.setState({
-      user: formUser
-    }, this.validateRecipient);
   };
 
   updateRecipientName = (event) => {
@@ -171,7 +168,11 @@ export default class SubmitForm extends Component {
       loading,
       subject,
       success,
-      successMessage
+      successMessage,
+      user: {
+        name,
+        email
+      }
     } = this.state;
     const userElements = [<option key={ 0 }>Select recipient</option>];
     const templateElements = [<option key={ 0 }>Select template</option>];
@@ -215,6 +216,7 @@ export default class SubmitForm extends Component {
           <div className="form-group">
             <Label for="templateName" text="Template name"/>
             <input
+              type="text"
               id="templateName"
               className="form-control"
               value={ this.state.templateName }
@@ -224,14 +226,14 @@ export default class SubmitForm extends Component {
               id="name"
               type="text"
               className="form-control"
-              value={ this.state.user.name }
+              value={ name }
               onChange={ this.updateRecipientName }/>
             <Label for="email" text="Recipient email"/>
             <input
               id="email"
               type="text"
               className="form-control"
-              value={ this.state.user.email }
+              value={ email }
               onChange={ this.updateRecipientEmail }/>
           </div>
           <div className="form-group">

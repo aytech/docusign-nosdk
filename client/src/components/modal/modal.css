@@ -41,8 +41,12 @@
   transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
+.modal-container.iframe {
+  height: calc(90%);
+}
+
 .modal-container.iframe .modal-body {
-  height: 720px;
+  height: 85%;
   margin-top: 10px;
   padding: 0;
 }

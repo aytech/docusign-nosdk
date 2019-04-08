@@ -133,23 +133,10 @@ public class DocuSignController {
     @RequestMapping(method = RequestMethod.POST, value = "sign")
     public HttpEntity<EnvelopeResponse> signDocument(@RequestBody SignRequest request) throws IOException, ApiException {
 
-        Document document = new Document();
-        InputStream documentFile = new ClassPathResource("static/demo_document.pdf").getInputStream();
-        String base64Doc = Base64.getEncoder().encodeToString(IOUtils.toByteArray(documentFile));
-        document.setDocumentBase64(base64Doc);
-        document.setDocumentId("1");
-        document.setName("Test document");
+        EnvelopeDefinition envelopeDefinition = new EnvelopeDefinition();
+        envelopeDefinition.setEmailSubject(request.getSubject());
 
-        List<Document> documents = new ArrayList<>();
-        documents.add(document);
-
-        if (request.isCreateTemplate()) {
-
-            TemplateSummary templateSummary = createTemplate(documents, request);
-            request.setTemplateId(templateSummary.getTemplateId());
-            System.out.println("Summary: " + templateSummary);
-        }
-
+        // Set tenant name
         CustomFields customFields = new CustomFields();
         List<TextCustomField> fields = new ArrayList<>();
         TextCustomField textCustomField = new TextCustomField();
@@ -157,22 +144,37 @@ public class DocuSignController {
         textCustomField.setValue("infor");
         fields.add(textCustomField);
         customFields.setTextCustomFields(fields);
-
-        // create a new envelope to manage the signature request
-        EnvelopeDefinition envelopeDefinition = new EnvelopeDefinition();
-        envelopeDefinition.setEmailSubject(request.getSubject());
-        envelopeDefinition.setTemplateId(request.getTemplateId());
         envelopeDefinition.setCustomFields(customFields);
 
-//        TemplateRole templateRole = new TemplateRole();
-//        templateRole.setRoleName(request.getName());
-//        templateRole.setName(request.getName());
-//        templateRole.setEmail(request.getEmail());
-//
-//        List<TemplateRole> templateRoles = new ArrayList<>();
-//        templateRoles.add(templateRole);
-//
-//        envelopeDefinition.setTemplateRoles(templateRoles);
+        // Add document to the envelope
+        List<Document> documents = new ArrayList<>();
+        Document document = new Document();
+        InputStream documentFile = new ClassPathResource("static/demo_document.pdf").getInputStream();
+        String base64Doc = Base64.getEncoder().encodeToString(IOUtils.toByteArray(documentFile));
+        document.setDocumentBase64(base64Doc);
+        document.setFileExtension("pdf");
+        document.setDocumentId("1"); // @todo: try to generate a UUID
+        document.setName("Test document");
+        documents.add(document);
+        envelopeDefinition.setDocuments(documents);
+
+        // Add recipients to the envelope
+        Recipients recipients = new Recipients();
+        Signer signer = new Signer();
+        signer.setName(request.getName());
+        signer.setEmail(request.getEmail());
+        signer.setRecipientId(request.getUserId());
+        signer.setRoutingOrder("1");
+        recipients.setSigners(Collections.singletonList(signer));
+        envelopeDefinition.setRecipients(recipients);
+
+        if (request.isCreateTemplate()) {
+            TemplateSummary templateSummary = createTemplate(documents, request);
+            request.setTemplateId(templateSummary.getTemplateId());
+            System.out.println("Summary: " + templateSummary);
+        }
+
+        envelopeDefinition.setTemplateId(request.getTemplateId());
 
         // send the envelope by setting |status| to "sent". To save as a draft set to "created"
         envelopeDefinition.setStatus("sent");
@@ -268,6 +270,16 @@ public class DocuSignController {
         envelopeTemplate.setDocuments(documents);
         envelopeTemplate.setBrandId(INFOR_BRAND_ID);
         envelopeTemplate.setEmailSubject(request.getSubject());
+
+        // Set template signer
+        Recipients recipients = new Recipients();
+        Signer signer = new Signer();
+        signer.setEmail(request.getEmail());
+        signer.setName(request.getName());
+        signer.setRecipientId(request.getUserId());
+        signer.setRoutingOrder("1");
+        recipients.setSigners(Collections.singletonList(signer));
+        envelopeTemplate.setRecipients(recipients);
 
         EnvelopeTemplateDefinition envelopeTemplateDefinition = new EnvelopeTemplateDefinition();
         envelopeTemplateDefinition.setName(request.getTemplateName());

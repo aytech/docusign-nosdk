@@ -1,7 +1,7 @@
 version: "3"
 services:
   docusign:
-    image: idmuser/docusign
+    image: idmuser/docusign:latest
     ports:
       - "8080:8080"
     restart: "no"

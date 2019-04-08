@@ -28,7 +28,7 @@ import static com.docusign.configuration.Configuration.*;
 
 @RestController
 @RequestMapping(value = "/api")
-public class DocuSignController {
+public class DocuSignApiController {
 
     private ApiClient apiClient;
     private String BaseUrl = "https://demo.docusign.net";
@@ -37,7 +37,7 @@ public class DocuSignController {
     private String envelopeID;
 
     @Autowired
-    public DocuSignController() {
+    public DocuSignApiController() {
         apiClient = new ApiClient(BaseUrl + "/restapi");
         Configuration.setDefaultApiClient(apiClient);
     }

@@ -24,12 +24,14 @@ import java.net.URI;
 import java.util.*;
 import java.util.List;
 
-import static com.docusign.configuration.Configuration.*;
+import static com.docusign.configuration.Configuration.DRILLBACK;
+import static com.docusign.configuration.Configuration.TENANT_ID;
 
 @RestController
 @RequestMapping(value = "/api")
 public class DocuSignApiController {
 
+    private com.docusign.configuration.Configuration configuration;
     private ApiClient apiClient;
     private String BaseUrl = "https://demo.docusign.net";
     private String integratorKey = "e1127ed3-f1b5-40e4-b431-06c19f3983bd";
@@ -38,17 +40,18 @@ public class DocuSignApiController {
 
     @Autowired
     public DocuSignApiController() {
+        configuration = new com.docusign.configuration.Configuration();
         apiClient = new ApiClient(BaseUrl + "/restapi");
         Configuration.setDefaultApiClient(apiClient);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "auth/code")
     public HttpEntity<URI> getCodeGrantAuthURL() {
-        String randomState = "state_random_string";
+        String randomState = String.format("{%s}.{%s}", TENANT_ID, DRILLBACK);
         List<String> scopes = new ArrayList<>();
         scopes.add(OAuth.Scope_SIGNATURE);
-
-        URI oauthLoginUrl = apiClient.getAuthorizationUri(integratorKey, scopes, REDIRECT_URI, OAuth.CODE, randomState);
+        URI oauthLoginUrl = apiClient.getAuthorizationUri(
+                integratorKey, scopes, configuration.getRedirectUri(), OAuth.CODE, randomState);
 
         return new ResponseEntity<>(oauthLoginUrl, HttpStatus.OK);
     }
@@ -103,7 +106,7 @@ public class DocuSignApiController {
         } catch (ApiException e) {
             System.out.println("Error authenticating JWT: " + e.getMessage());
             e.printStackTrace();
-            response.setJwtUrl(apiClient.getJWTUri(integratorKey, REDIRECT_URI, AUTH_SERVER_URI));
+            response.setJwtUrl(apiClient.getJWTUri(integratorKey, configuration.getRedirectUri(), configuration.getAuthServerURI()));
             response.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
@@ -202,7 +205,7 @@ public class DocuSignApiController {
 
     private ConsoleViewRequest makeConsoleViewRequest() {
         ConsoleViewRequest viewRequest = new ConsoleViewRequest();
-        viewRequest.setReturnUrl("http://localhost:3000/ds-return");
+        viewRequest.setReturnUrl(configuration.getRedirectUri());
         viewRequest.setEnvelopeId(envelopeID);
         return viewRequest;
     }
@@ -268,7 +271,7 @@ public class DocuSignApiController {
         EnvelopeTemplate envelopeTemplate = new EnvelopeTemplate();
 
         envelopeTemplate.setDocuments(documents);
-        envelopeTemplate.setBrandId(INFOR_BRAND_ID);
+        envelopeTemplate.setBrandId(configuration.getInforBrandID());
         envelopeTemplate.setEmailSubject(request.getSubject());
 
         // Set template signer

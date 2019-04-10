@@ -1,15 +1,48 @@
 package com.docusign.configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Configuration {
-    // point to the demo (sandbox) environment. For production requests your account sub-domain
-    // will vary, you should always use the base URI that is returned from authentication to
-    // ensure your integration points to the correct endpoints (in both environments)
-    // use demo authentication server (remove -d for production)
-    public final static String AUTH_SERVER_URI = "https://account-d.docusign.com";
 
-    // configure the authorization flow on the api client,
-    // this must match a redirect URI (case-sensitive) configured on the key
-    public final static String REDIRECT_URI = "http://localhost:8080/ds-return";
+    // Variables that can be overridden by the environment
+    private final String RedirectURIKey = "REDIRECT_URI";
+    private Map<String, String> environmentVariables = new HashMap<>();
 
-    public final static String INFOR_BRAND_ID = "4c7bbcc1-65ad-4326-bf51-34595a55f7fa";
+    public final static String TENANT_ID = "infor";
+    public final static String DRILLBACK = "favoriteContext=LogicalId=lid://infor.daf.daf";
+
+    public Configuration() {
+        String defaultRedirectURI = "http://localhost:8080/ds-return";
+        environmentVariables.put(RedirectURIKey, defaultRedirectURI);
+        for (String key : environmentVariables.keySet()) {
+            String systemVariable = System.getenv(key);
+            if (systemVariable != null) {
+                environmentVariables.put(key, systemVariable);
+            }
+        }
+    }
+
+    public String getAuthServerURI() {
+        // point to the demo (sandbox) environment. For production requests your account sub-domain
+        // will vary, you should always use the base URI that is returned from authentication to
+        // ensure your integration points to the correct endpoints (in both environments)
+        // use demo authentication server (remove -d for production)
+        return "https://account-d.docusign.com";
+    }
+
+    public String getInforBrandID() {
+        // Brand to be used for envelopes
+        return "4c7bbcc1-65ad-4326-bf51-34595a55f7fa";
+    }
+
+    /*
+     * Redirect URI for the Auth Grant flow. Must be registered in DocuSign App settings.
+     * This is the exact match, no parameters can be appended. All query parameters must
+     * be passed to $state variable passed to DocuSign.
+     * This value can be overridden by environment variable
+     */
+    public String getRedirectUri() {
+        return environmentVariables.get(RedirectURIKey);
+    }
 }

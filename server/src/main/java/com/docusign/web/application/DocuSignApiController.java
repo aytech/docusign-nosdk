@@ -47,7 +47,7 @@ public class DocuSignApiController {
 
     @RequestMapping(method = RequestMethod.GET, value = "auth/code")
     public HttpEntity<URI> getCodeGrantAuthURL() {
-        String randomState = String.format("{%s}.{%s}", TENANT_ID, DRILLBACK);
+        String randomState = String.format("tenant=%s&context=%s", TENANT_ID, DRILLBACK);
         List<String> scopes = new ArrayList<>();
         scopes.add(OAuth.Scope_SIGNATURE);
         URI oauthLoginUrl = apiClient.getAuthorizationUri(

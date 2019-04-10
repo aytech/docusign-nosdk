@@ -10,7 +10,7 @@ public class Configuration {
     private Map<String, String> environmentVariables = new HashMap<>();
 
     public final static String TENANT_ID = "infor";
-    public final static String DRILLBACK = "favoriteContext=LogicalId=lid://infor.daf.daf";
+    public final static String DRILLBACK = "LogicalId=lid://infor.daf.daf";
 
     public Configuration() {
         String defaultRedirectURI = "http://localhost:8080/ds-return";

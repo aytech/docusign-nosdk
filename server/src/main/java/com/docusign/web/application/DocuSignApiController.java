@@ -145,6 +145,7 @@ public class DocuSignApiController {
         TextCustomField textCustomField = new TextCustomField();
         textCustomField.setName("tenant");
         textCustomField.setValue("infor");
+        textCustomField.setShow("true");
         fields.add(textCustomField);
         customFields.setTextCustomFields(fields);
         envelopeDefinition.setCustomFields(customFields);

@@ -5,12 +5,15 @@ import java.util.Map;
 
 public class Configuration {
 
+    // Static configuration
+    public static final String TENANT_TITLE = "InforOS Tenant";
+    public static final String TENANT_ID = "DEVIDMADE2_AX1";
+    public static final String REGION_ID = "US-EAST";
+    public final static String DRILLBACK = "LogicalId=lid://infor.daf.daf";
+
     // Variables that can be overridden by the environment
     private final String RedirectURIKey = "REDIRECT_URI";
     private Map<String, String> environmentVariables = new HashMap<>();
-
-    public final static String TENANT_ID = "infor";
-    public final static String DRILLBACK = "LogicalId=lid://infor.daf.daf";
 
     public Configuration() {
         String defaultRedirectURI = "http://localhost:8080/ds-return";

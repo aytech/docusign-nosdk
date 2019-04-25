@@ -24,8 +24,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.List;
 
-import static com.docusign.configuration.Configuration.DRILLBACK;
-import static com.docusign.configuration.Configuration.TENANT_ID;
+import static com.docusign.configuration.Configuration.*;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -137,14 +136,14 @@ public class DocuSignApiController {
     public HttpEntity<EnvelopeResponse> signDocument(@RequestBody SignRequest request) throws IOException, ApiException {
 
         EnvelopeDefinition envelopeDefinition = new EnvelopeDefinition();
-        envelopeDefinition.setEmailSubject(request.getSubject());
+        envelopeDefinition.setEmailSubject(String.format("%s (%s): %s", TENANT_ID, REGION_ID, request.getSubject()));
 
         // Set tenant name
         CustomFields customFields = new CustomFields();
         List<TextCustomField> fields = new ArrayList<>();
         TextCustomField textCustomField = new TextCustomField();
-        textCustomField.setName("tenant");
-        textCustomField.setValue("infor");
+        textCustomField.setName(TENANT_TITLE);
+        textCustomField.setValue(String.format("%s (%s)", TENANT_ID, REGION_ID));
         textCustomField.setShow("true");
         fields.add(textCustomField);
         customFields.setTextCustomFields(fields);
@@ -175,7 +174,6 @@ public class DocuSignApiController {
         if (request.isCreateTemplate()) {
             TemplateSummary templateSummary = createTemplate(documents, request);
             request.setTemplateId(templateSummary.getTemplateId());
-            System.out.println("Summary: " + templateSummary);
         }
 
         envelopeDefinition.setTemplateId(request.getTemplateId());

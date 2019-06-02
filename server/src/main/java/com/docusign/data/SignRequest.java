@@ -9,6 +9,7 @@ public class SignRequest {
     private String templateId;
     private String templateName;
     private String userId;
+    private int documentCount;
 
     public String getUserId() {
         return userId;
@@ -78,6 +79,14 @@ public class SignRequest {
         this.message = message;
     }
 
+    public int getDocumentCount() {
+        return documentCount;
+    }
+
+    public void setDocumentCount(int documentCount) {
+        this.documentCount = documentCount;
+    }
+
     @Override
     public String toString() {
         return "SignRequest{" +
@@ -86,6 +95,7 @@ public class SignRequest {
                 ", subject='" + subject + '\'' +
                 ", createTemplate='" + createTemplate + '\'' +
                 ", message='" + message + '\'' +
+                ", documentCount='" + documentCount + '\'' +
                 '}';
     }
 }

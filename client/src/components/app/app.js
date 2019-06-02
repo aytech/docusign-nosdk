@@ -34,7 +34,16 @@ class App extends Component {
         })
       }
     });
+    this.selectedCheckboxes = new Set();
   }
+
+  toggleCheckbox = label => {
+    if (this.selectedCheckboxes.has(label)) {
+      this.selectedCheckboxes.delete(label);
+    } else {
+      this.selectedCheckboxes.add(label);
+    }
+  };
 
   closeIframeModal = () => {
     this.setState({ iframeModalOpen: false });
@@ -108,7 +117,8 @@ class App extends Component {
                     queryParams={ props.location }/>
                   <PageBody
                     documentEnvelope={ this.state.documentEnvelope }
-                    user={ this.state.user }/>
+                    user={ this.state.user }
+                    toggleCheckbox={ this.toggleCheckbox }/>
                   <Modal
                     header="Sign document"
                     iframe={ false }
@@ -119,7 +129,8 @@ class App extends Component {
                       templates={ this.state.templates }
                       senderView={ this.state.senderView }
                       onDocumentSubmit={ this.onDocumentSubmit }
-                      openSenderView={ this.openSenderView }/>
+                      openSenderView={ this.openSenderView }
+                      selectedCheckboxes={ this.selectedCheckboxes }/>
                   </Modal>
                   <Modal
                     header="Login to DocuSign"

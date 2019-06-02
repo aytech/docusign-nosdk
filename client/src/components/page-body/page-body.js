@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Checkbox from '../checkbox/checkbox';
 
 export default class PageBody extends Component {
 
@@ -15,7 +16,7 @@ export default class PageBody extends Component {
       status: ''
     };
 
-    let { user, documentEnvelope: { envelope, tenantId } } = this.props;
+    let { user, documentEnvelope: { envelope, tenantId }, toggleCheckbox } = this.props;
 
     if (user === undefined || user === null) {
       user = defaultUser;
@@ -73,11 +74,35 @@ export default class PageBody extends Component {
               </table>
             </div>
           </div>
-          <div className="col-md-12 col-lg-9">
+        </div>
+        <div className="row">
+          <div className="col-md-1 col-lg-1">
+            <div className="checkbox">
+              <Checkbox
+                label="one"
+                handleCheckboxChange={ toggleCheckbox }/>
+            </div>
+          </div>
+          <div className="col-md-11 col-lg-8">
             <embed
               src={ '/demo_document.pdf' }
-              width='800'
-              height='1100px'/>
+              width='500'
+              height='700px'/>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-1 col-lg-1">
+            <div className="checkbox">
+              <Checkbox
+                label="two"
+                handleCheckboxChange={ toggleCheckbox }/>
+            </div>
+          </div>
+          <div className="col-md-11 col-lg-8">
+            <embed
+              src={ '/demo_document.pdf' }
+              width='500'
+              height='700px'/>
           </div>
         </div>
       </div>

@@ -159,6 +159,16 @@ public class DocuSignApiController {
         document.setDocumentId("1"); // @todo: try to generate a UUID
         document.setName("Test document");
         documents.add(document);
+
+        if (request.getDocumentCount() > 1) {
+            Document secondDocument = new Document();
+            secondDocument.setDocumentBase64(base64Doc);
+            secondDocument.setFileExtension("pdf");
+            secondDocument.setDocumentId("2");
+            secondDocument.setName("Test second document");
+            documents.add(secondDocument);
+        }
+
         envelopeDefinition.setDocuments(documents);
 
         // Add recipients to the envelope

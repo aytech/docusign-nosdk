@@ -48,7 +48,11 @@ export default class SubmitForm extends Component {
 
   signDocument = () => {
     this.setState({ loading: true });
-    const { senderView, openSenderView } = this.props;
+    const {
+      senderView,
+      openSenderView,
+      selectedCheckboxes
+    } = this.props;
     const {
       subject,
       createTemplate,
@@ -65,7 +69,8 @@ export default class SubmitForm extends Component {
         createTemplate,
         template,
         templateName,
-        userId: id
+        userId: id,
+        documentCount: selectedCheckboxes.size
       }),
       headers: {
         'Content-Type': 'application/json'
@@ -84,7 +89,6 @@ export default class SubmitForm extends Component {
           success = true;
           successMessage = 'Document submitted successfully';
         } else {
-          error = true;
           errorMessage = response.statusText;
         }
         this.setState({

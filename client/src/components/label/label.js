@@ -3,11 +3,14 @@ import React from 'react';
 const Label = (props) => {
   const {
     for: htmlFor,
-    text
+    text,
+    hidden
   } = props;
 
   return (
-    <label htmlFor={ htmlFor }>
+    <label
+      className={ hidden ? "hidden" : "" }
+      htmlFor={ htmlFor }>
       { text }
     </label>
   );

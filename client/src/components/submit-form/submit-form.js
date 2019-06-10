@@ -15,14 +15,37 @@ export default class SubmitForm extends Component {
     successMessage: '',
     template: null,
     templateName: '',
-    user: {}
+    name: '',
+    email: '',
+    recipients: new Map()
+  };
+
+  canSubmit = () => {
+    return this.state.recipients.size > 0;
+  };
+
+  updateName = (event) => {
+    this.setState({ name: event.target.value.trim() });
+  };
+
+  updateEmail = (event) => {
+    this.setState({ email: event.target.value.trim() });
+  };
+
+  addRecipient = (event) => {
+    event.preventDefault();
+    const { name, email, recipients } = this.state;
+    if (name !== '' && email !== '' && !recipients.has(name)) {
+      recipients.set(name, email);
+      this.setState({ name, email, recipients });
+    }
   };
 
   toggleCreateTemplate = () => {
     this.setState((currentState) => {
-      const newState = currentState;
-      newState.createTemplate = newState.createTemplate !== true;
-      return newState;
+      return {
+        createTemplate: !currentState.createTemplate
+      }
     });
   };
 
@@ -173,10 +196,9 @@ export default class SubmitForm extends Component {
       subject,
       success,
       successMessage,
-      user: {
-        name,
-        email
-      }
+      name,
+      email,
+      recipients
     } = this.state;
     const userElements = [<option key={ 0 }>Select recipient</option>];
     const templateElements = [<option key={ 0 }>Select template</option>];
@@ -198,6 +220,9 @@ export default class SubmitForm extends Component {
         </option>
       );
     }
+    for (const recipient in recipients.entries()) {
+      recipients.push(`<span class="label label-primary">${ recipient.name }&lt;${ recipient.email }&gt;</span>`);
+    }
     return (
       <form onSubmit={ this.submitForm }>
         <div className="form-group">
@@ -218,29 +243,37 @@ export default class SubmitForm extends Component {
         </div>
         <div>
           <div className="form-group">
-            <Label for="templateName" text="Template name"/>
+            <Label
+              hidden={ this.state.createTemplate === false }
+              for="templateName"
+              text="Template name"/>
             <input
               type="text"
               id="templateName"
-              className="form-control"
+              className={ this.state.createTemplate === true ? "form-control" : "form-control hidden" }
               value={ this.state.templateName }
               onChange={ this.updateTemplateName }/>
+            <div>
+              { recipients }
+              {/*<span className="label label-primary">Primary</span>*/ }
+            </div>
             <Label for="name" text="Recipient name"/>
             <input
               id="name"
               type="text"
               className="form-control"
               value={ name }
-              onChange={ this.updateRecipientName }/>
+              onChange={ this.updateName }/>
             <Label for="email" text="Recipient email"/>
             <input
               id="email"
               type="text"
               className="form-control"
               value={ email }
-              onChange={ this.updateRecipientEmail }/>
+              onChange={ this.updateEmail }/>
           </div>
-          <div className="form-group">
+          <Button onClick={ this.addRecipient }/>
+          <div className="form-group intermediate">
             <Label for="recipient" text="Or select recipient"/>
             <select
               id="recipient"
@@ -275,8 +308,12 @@ export default class SubmitForm extends Component {
         </div>
         }
         <Button
+          type="primary"
           loading={ loading }
-          disabled={ error === true || loading === true }/>
+          disabled={
+            error === true
+            || loading === true
+            || !this.canSubmit() }/>
       </form>
     );
   }

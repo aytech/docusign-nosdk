@@ -3,27 +3,25 @@ import './button.css';
 
 const Button = (props) => {
 
-  const { loading, disabled, type, onClick } = props;
+  const { loading, disabled, type, text, onClick } = props;
   let style = "btn btn-block";
   let content;
 
-  switch (type) {
-    case "primary":
-      style += " btn-primary";
-      break;
-    default:
-      style += " btn-default";
+  if (type === "primary") {
+    style += " btn-primary";
+  } else {
+    style += " btn-default";
   }
 
   if (loading === true) {
     content = (
       <div className="fa-sm">
         <i className="fas fa-sync fa-spin"/>
-        Submit
+        { text }
       </div>
     );
   } else {
-    content = 'Submit';
+    content = text;
   }
 
   return (

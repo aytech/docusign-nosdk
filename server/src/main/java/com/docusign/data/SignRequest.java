@@ -1,5 +1,7 @@
 package com.docusign.data;
 
+import java.util.List;
+
 public class SignRequest {
     private String email;
     private String name;
@@ -8,15 +10,15 @@ public class SignRequest {
     private boolean createTemplate;
     private String templateId;
     private String templateName;
-    private String userId;
+    private List<Recipient> recipients;
     private int documentCount;
 
-    public String getUserId() {
-        return userId;
+    public List<Recipient> getRecipients() {
+        return recipients;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setRecipients(List<Recipient> recipients) {
+        this.recipients = recipients;
     }
 
     public String getTemplateName() {

@@ -1,3 +1,10 @@
 .form-group.intermediate {
   margin-top: 10px;
 }
+
+.label-warning {
+  display: block;
+  margin-bottom: 5px;
+  cursor: pointer;
+  padding: 5px 0;
+}

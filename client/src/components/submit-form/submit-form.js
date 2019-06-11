@@ -32,19 +32,56 @@ export default class SubmitForm extends Component {
     this.setState({ email: event.target.value.trim() });
   };
 
-  addRecipient = (event) => {
-    event.preventDefault();
-    const { name, email, recipients } = this.state;
-    if (name !== '' && email !== '' && !recipients.has(name)) {
-      recipients.set(name, email);
-      this.setState({ name, email, recipients });
+  addRecipient = (key, recipient) => {
+    const { recipients } = this.state;
+    if (recipients.has(key)) {
+      recipients.delete(key);
     }
+    recipients.set(key, recipient);
+    this.setState({ recipients });
+  };
+
+  addRecipientHandler = (event) => {
+    event.preventDefault();
+    const { name, email } = this.state;
+    const recipient = { name, email };
+    if (name !== '' && email !== '') {
+      this.setState({
+        name: "",
+        email: ""
+      });
+      this.addRecipient(name, recipient);
+    }
+  };
+
+  selectRecipientHandler = (event) => {
+    for (const user of this.props.users) {
+      if (user.id === event.target.value) {
+        const name = `${ user.firstName } ${ user.lastName }`;
+        this.addRecipient(name, {
+          id: user.id,
+          name: name,
+          email: user.email
+        });
+      }
+    }
+  };
+
+  removeRecipient = (name) => {
+    this.setState((state) => {
+      const { recipients } = state;
+      if (recipients.has(name)) {
+        recipients.delete(name);
+      }
+      return recipients;
+    });
   };
 
   toggleCreateTemplate = () => {
     this.setState((currentState) => {
+      const { createTemplate } = currentState;
       return {
-        createTemplate: !currentState.createTemplate
+        createTemplate: !createTemplate
       }
     });
   };
@@ -55,8 +92,8 @@ export default class SubmitForm extends Component {
   };
 
   validateRecipient = (callback) => {
-    const { user } = this.state;
-    if (user.name === '' || user.email === '') {
+    const { recipients } = this.state;
+    if (recipients.size < 1) {
       this.setState({
         error: true,
         errorMessage: 'Please add or select recipient'
@@ -81,18 +118,16 @@ export default class SubmitForm extends Component {
       createTemplate,
       template,
       templateName,
-      user: { email, name, id }
+      recipients
     } = this.state;
 
     fetch('/api/sign', {
       body: JSON.stringify({
-        email,
-        name,
         subject,
         createTemplate,
         template,
         templateName,
-        userId: id,
+        recipients: Array.from(recipients.values()),
         documentCount: selectedCheckboxes.size
       }),
       headers: {
@@ -142,50 +177,30 @@ export default class SubmitForm extends Component {
     });
   };
 
-  selectRecipient = (event) => {
-    for (const user of this.props.users) {
-      if (user.id === event.target.value) {
-        const formUser = {
-          id: user.id,
-          name: `${ user.firstName } ${ user.lastName }`,
-          email: user.email
-        };
-        this.setState({
-          user: formUser
-        }, this.validateRecipient);
-        return;
-      }
-    }
-  };
-
-  updateRecipientName = (event) => {
-    const name = event.target.value;
-    this.setState(({ user }) => {
-      return {
-        user: {
-          name: name,
-          email: user.email
-        }
-      };
-    }, this.validateRecipient);
-  };
-
-  updateRecipientEmail = (event) => {
-    const email = event.target.value;
-    this.setState(({ user }) => {
-      return {
-        user: {
-          name: user.name,
-          email: email
-        }
-      };
-    }, this.validateRecipient);
-  };
-
   updateTemplateName = (event) => {
     this.setState({
       templateName: event.target.value
     });
+  };
+
+  getRecipientsElements = () => {
+    const { recipients } = this.state;
+    const elements = [];
+    recipients.forEach((value) => {
+      const { id, name, email } = value;
+      const element_id = id === undefined ? name : id;
+      elements.push(
+        <span
+          key={ element_id }
+          className="label label-warning"
+          onClick={ () => {
+            this.removeRecipient(name);
+          } }>
+          { name } &lt;{ email }&gt;
+        </span>
+      );
+    });
+    return elements;
   };
 
   render() {
@@ -198,7 +213,6 @@ export default class SubmitForm extends Component {
       successMessage,
       name,
       email,
-      recipients
     } = this.state;
     const userElements = [<option key={ 0 }>Select recipient</option>];
     const templateElements = [<option key={ 0 }>Select template</option>];
@@ -219,9 +233,6 @@ export default class SubmitForm extends Component {
           { template.name }
         </option>
       );
-    }
-    for (const recipient in recipients.entries()) {
-      recipients.push(`<span class="label label-primary">${ recipient.name }&lt;${ recipient.email }&gt;</span>`);
     }
     return (
       <form onSubmit={ this.submitForm }>
@@ -254,8 +265,7 @@ export default class SubmitForm extends Component {
               value={ this.state.templateName }
               onChange={ this.updateTemplateName }/>
             <div>
-              { recipients }
-              {/*<span className="label label-primary">Primary</span>*/ }
+              { this.getRecipientsElements() }
             </div>
             <Label for="name" text="Recipient name"/>
             <input
@@ -272,13 +282,15 @@ export default class SubmitForm extends Component {
               value={ email }
               onChange={ this.updateEmail }/>
           </div>
-          <Button onClick={ this.addRecipient }/>
+          <Button
+            text="Add Recipient"
+            onClick={ this.addRecipientHandler }/>
           <div className="form-group intermediate">
             <Label for="recipient" text="Or select recipient"/>
             <select
               id="recipient"
               className="form-control"
-              onChange={ this.selectRecipient }>
+              onChange={ this.selectRecipientHandler }>
               { userElements }
             </select>
           </div>
@@ -309,6 +321,7 @@ export default class SubmitForm extends Component {
         }
         <Button
           type="primary"
+          text="Submit"
           loading={ loading }
           disabled={
             error === true

@@ -173,12 +173,20 @@ public class DocuSignApiController {
 
         // Add recipients to the envelope
         Recipients recipients = new Recipients();
-        Signer signer = new Signer();
-        signer.setName(request.getName());
-        signer.setEmail(request.getEmail());
-        signer.setRecipientId(request.getUserId());
-        signer.setRoutingOrder("1");
-        recipients.setSigners(Collections.singletonList(signer));
+        List<Signer> signers = new ArrayList<>();
+        for (Recipient recipient : request.getRecipients()) {
+            Signer signer = new Signer();
+            signer.setName(recipient.getName());
+            signer.setEmail(recipient.getEmail());
+            if (recipient.getId() == null) {
+                signer.setRecipientId(UUID.randomUUID().toString());
+            } else {
+                signer.setClientUserId(recipient.getId());
+                signer.setRecipientId(recipient.getId());
+            }
+            signers.add(signer);
+        }
+        recipients.setSigners(signers);
         envelopeDefinition.setRecipients(recipients);
 
         if (request.isCreateTemplate()) {
@@ -288,7 +296,7 @@ public class DocuSignApiController {
         Signer signer = new Signer();
         signer.setEmail(request.getEmail());
         signer.setName(request.getName());
-        signer.setRecipientId(request.getUserId());
+//        signer.setRecipientId(request.getUserId());
         signer.setRoutingOrder("1");
         recipients.setSigners(Collections.singletonList(signer));
         envelopeTemplate.setRecipients(recipients);

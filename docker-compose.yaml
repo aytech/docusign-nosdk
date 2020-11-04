@@ -3,7 +3,7 @@ services:
   docusign:
     image: idmuser/docusign:latest
     ports:
-      - "8080:8080"
+      - "8888:8080"
     restart: "no"
 #    environment:
 #      - REDIRECT_URI=https://idm-ade-5.idm.awsdev.infor.com:443/ca/mingle/client.html

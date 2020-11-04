@@ -38,10 +38,11 @@ configurations {
 
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
-    implementation('com.docusign:docusign-esign-java:2.9.0')
+    implementation('com.docusign:docusign-esign-java:3.6.0')
     // Apache Commons IO
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
     // Dev
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testCompile('org.springframework.boot:spring-boot-starter-test')
+    implementation 'org.testng:testng:6.9.6'
 }

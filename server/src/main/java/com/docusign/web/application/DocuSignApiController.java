@@ -158,6 +158,10 @@ public class DocuSignApiController {
         document.setFileExtension("pdf");
         document.setDocumentId("1"); // @todo: try to generate a UUID
         document.setName("Test document");
+        List<NameValue> documentFields = new ArrayList<>();
+        NameValue id = new NameValue();
+        id.setName("PID");
+        id.setValue("");
         documents.add(document);
 
         if (request.getDocumentCount() > 1) {
@@ -195,6 +199,17 @@ public class DocuSignApiController {
         }
 
         envelopeDefinition.setTemplateId(request.getTemplateId());
+
+        EventNotification eventNotification = new EventNotification();
+        ConnectEventData connectEventData = new ConnectEventData();
+        connectEventData.setFormat();
+        eventNotification.setEventData();
+        List<EnvelopeEvent> envelopeEvents = new ArrayList<>();
+        EnvelopeEvent envelopeEvent = new EnvelopeEvent();
+        envelopeEvent.setEnvelopeEventStatusCode("Sent");
+        envelopeEvents.add(envelopeEvent);
+        eventNotification.setEnvelopeEvents(envelopeEvents);
+        envelopeDefinition.setEventNotification(eventNotification);
 
         // send the envelope by setting |status| to "sent". To save as a draft set to "created"
         envelopeDefinition.setStatus("sent");

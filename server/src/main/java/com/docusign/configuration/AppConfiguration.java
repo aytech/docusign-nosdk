@@ -3,7 +3,7 @@ package com.docusign.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Configuration {
+public class AppConfiguration {
 
     // Static configuration
     public static final String TENANT_TITLE = "InforOS Tenant";
@@ -15,8 +15,8 @@ public class Configuration {
     private final String RedirectURIKey = "REDIRECT_URI";
     private Map<String, String> environmentVariables = new HashMap<>();
 
-    public Configuration() {
-        String defaultRedirectURI = "http://localhost:8080/ds-return";
+    public AppConfiguration() {
+        String defaultRedirectURI = "http://localhost:3000/ds-return";
         environmentVariables.put(RedirectURIKey, defaultRedirectURI);
         for (String key : environmentVariables.keySet()) {
             String systemVariable = System.getenv(key);
